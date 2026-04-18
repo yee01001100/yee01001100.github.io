@@ -1,0 +1,855 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>汇编 | yee01001100</title><meta name="author" content="yee01001100"><meta name="copyright" content="yee01001100"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="汇编指令与寄存器前导什么是CPU？ CPU是计算机的核心组件，负责执行计算机程序的所有指令。它的性能直接决定了计算机的运算速度和处理能力。 指令：CPU执行的指令是机器指令，它是由0和1组成的二进制代码。CPU能够直接理解和执行的指令就是机器语言，这些指令在底层以二进制的形式存在，是计算机硬件能够直接识别的最基本形式。 虽然计算机本身理解机器语言，但是这种语言直接使用0和1来编写的方式还是太困难和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="汇编">
+<meta property="og:url" content="https://yee01001100.github.io/2026/04/18/%E6%B1%87%E7%BC%96%E8%B5%84%E6%96%99/index.html">
+<meta property="og:site_name" content="yee01001100">
+<meta property="og:description" content="汇编指令与寄存器前导什么是CPU？ CPU是计算机的核心组件，负责执行计算机程序的所有指令。它的性能直接决定了计算机的运算速度和处理能力。 指令：CPU执行的指令是机器指令，它是由0和1组成的二进制代码。CPU能够直接理解和执行的指令就是机器语言，这些指令在底层以二进制的形式存在，是计算机硬件能够直接识别的最基本形式。 虽然计算机本身理解机器语言，但是这种语言直接使用0和1来编写的方式还是太困难和">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yee01001100.github.io/img/butterfly-icon.png">
+<meta property="article:published_time" content="2026-04-18T01:52:49.272Z">
+<meta property="article:modified_time" content="2026-04-18T01:54:41.158Z">
+<meta property="article:author" content="yee01001100">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yee01001100.github.io/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "汇编",
+  "url": "https://yee01001100.github.io/2026/04/18/%E6%B1%87%E7%BC%96%E8%B5%84%E6%96%99/",
+  "image": "https://yee01001100.github.io/img/butterfly-icon.png",
+  "datePublished": "2026-04-18T01:52:49.272Z",
+  "dateModified": "2026-04-18T01:54:41.158Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "yee01001100",
+      "url": "https://yee01001100.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yee01001100.github.io/2026/04/18/%E6%B1%87%E7%BC%96%E8%B5%84%E6%96%99/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '汇编',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">汇编</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">汇编</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-18T01:52:49.272Z" title="发表于 2026-04-18 09:52:49">2026-04-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-18T01:54:41.158Z" title="更新于 2026-04-18 09:54:41">2026-04-18</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="汇编指令与寄存器"><a href="#汇编指令与寄存器" class="headerlink" title="汇编指令与寄存器"></a>汇编指令与寄存器</h2><h3 id="前导"><a href="#前导" class="headerlink" title="前导"></a>前导</h3><p>什么是CPU？</p>
+<p>CPU是计算机的核心组件，负责执行计算机程序的所有<strong>指令</strong>。它的性能直接决定了计算机的运算速度和处理能力。</p>
+<p><strong>指令</strong>：CPU执行的指令是<strong>机器指令</strong>，它是由0和1组成的二进制代码。CPU能够直接理解和执行的指令就是机器语言，这些指令在底层以二进制的形式存在，是计算机硬件能够直接识别的最基本形式。</p>
+<p>虽然计算机本身理解机器语言，但是这种语言直接使用0和1来编写的方式还是太困难和低效。为了方便程序员的操作，<strong>汇编语言</strong>应运而生。汇编语言是一种使用助记符来表示机器指令的语言。每条汇编指令直接映射到一条机器指令，但是计算机并不认识汇编，它就需要通过汇编器将其转化为机器语言。汇编器是将汇编代码翻译成二进制机器指令，来供CPU执行的。</p>
+<p>举个🌰</p>
+<p>汇编语言中的 <code>MOV EAX ，1</code>，会被汇编器转化为机器语言的二进制指令 <code>B8 01 00 00 00</code>，这条机器指令直接控制CPU执行相应的操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">10111000 00000001 00000000 00000000 00000000</span><br><span class="line">汇编代码形式</span><br><span class="line">MOV EAX, 1</span><br></pre></td></tr></table></figure>
+
+<p>汇编语言与硬件架构紧密相关，不同的计算机架构（如x86，ARM)的汇编语言有很大不同</p>
+<p>计算机架构是指计算机系统的设计架构，包括其处理器的内部结构，指令集（ISA），寄存器，内存模型等。每组架构定义了一组可执行的指令，程序员编写的汇编语言正是与这些指令集架构密切相关的。</p>
+<p>每种 ISA：</p>
+<ul>
+<li>有自己的一套 <strong>寄存器名字</strong></li>
+<li>自己的一套 <strong>指令名字和用法</strong></li>
+<li>自己的 <strong>寻址方式、指令长度</strong> 等特征</li>
+</ul>
+<p>不同架构汇编指令的区分：（感兴趣的可以自行搜查）</p>
+<p>1.x86 &#x2F; x86-64（Intel&#x2F;AMD PC 上最常见）</p>
+<p>2.ARM &#x2F; AArch64（手机、树莓派、Apple M 系列）</p>
+<p>3.MIPS（一些嵌入式、教材常用）</p>
+<p>4.RISC-V（近几年很火的开源指令集）</p>
+<h3 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a>寄存器</h3><p>寄存器是CPU内部的高速存储单元。它用于存放临时的数据和计算的中间结果，具有非常快的访问速度。</p>
+<p>寄存器的大小通常与CPU的位数有关：</p>
+<p>在32位的x86架构中，寄存器的大小是32位（4字节）（内存地址也是）</p>
+<p>在64位的x86-64架构中，寄存器的大小是64位（8字节）（内存地址也是）</p>
+<p><strong>常见的通用寄存器</strong></p>
+<table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>对应 32 位</th>
+<th>用途 &#x2F; 说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>RAX</code></td>
+<td><code>EAX</code></td>
+<td>累加器，用于算术运算、函数返回值</td>
+</tr>
+<tr>
+<td><code>RBX</code></td>
+<td><code>EBX</code></td>
+<td>基地址寄存器，保存数据或偏移量</td>
+</tr>
+<tr>
+<td><code>RCX</code></td>
+<td><code>ECX</code></td>
+<td>计数器，常用于循环、shift、调用参数</td>
+</tr>
+<tr>
+<td><code>RDX</code></td>
+<td><code>EDX</code></td>
+<td>数据寄存器，用于储存乘法，除法的结果</td>
+</tr>
+<tr>
+<td><code>RSI</code></td>
+<td><code>ESI</code></td>
+<td>源地址索引，常用于字符串操作或传参</td>
+</tr>
+<tr>
+<td><code>RDI</code></td>
+<td><code>EDI</code></td>
+<td>目标地址索引，常用于字符串目标地址或第一个函数参数</td>
+</tr>
+<tr>
+<td><code>RBP</code></td>
+<td><code>EBP</code></td>
+<td>栈基址指针，指向栈的底部</td>
+</tr>
+<tr>
+<td><code>RSP</code></td>
+<td><code>ESP</code></td>
+<td>栈顶指针，始终指向栈顶</td>
+</tr>
+<tr>
+<td><code>RIP</code></td>
+<td><code>EIP</code></td>
+<td>指令指针，存储下一条要执行的指令地址（只读）</td>
+</tr>
+</tbody></table>
+<p><strong>x86_64 新增寄存器（64 位特有）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>R8</code></td>
+<td>第五个函数参数（System V ABI）</td>
+</tr>
+<tr>
+<td><code>R9</code></td>
+<td>第六个函数参数</td>
+</tr>
+<tr>
+<td><code>R10</code></td>
+<td>临时寄存器（如 syscall 第四个参数）</td>
+</tr>
+<tr>
+<td><code>R11</code></td>
+<td>临时寄存器</td>
+</tr>
+<tr>
+<td><code>R12</code></td>
+<td>通用用途</td>
+</tr>
+<tr>
+<td><code>R13</code></td>
+<td>通用用途</td>
+</tr>
+<tr>
+<td><code>R14</code></td>
+<td>通用用途</td>
+</tr>
+<tr>
+<td><code>R15</code></td>
+<td>通用用途</td>
+</tr>
+</tbody></table>
+<p><strong>一些常见的汇编指令</strong></p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>含义</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>MOV</code></td>
+<td>数据传送</td>
+<td><code>mov eax, ebx</code></td>
+<td>把 <code>ebx</code> 的值复制到 <code>eax</code></td>
+</tr>
+<tr>
+<td><code>PUSH</code></td>
+<td>压栈</td>
+<td><code>push eax</code></td>
+<td>把 <code>eax</code> 的值压入栈顶</td>
+</tr>
+<tr>
+<td><code>POP</code></td>
+<td>出栈</td>
+<td><code>pop ebx</code></td>
+<td>从栈顶弹出一个值放入 <code>ebx</code></td>
+</tr>
+<tr>
+<td><code>LEA</code></td>
+<td>加载地址</td>
+<td><code>lea eax, [ebx+4]</code></td>
+<td>把地址 <code>ebx+4</code> 计算结果存入 <code>eax</code></td>
+</tr>
+<tr>
+<td><code>XCHG</code></td>
+<td>交换数据</td>
+<td><code>xchg eax, ebx</code></td>
+<td>交换两个操作数的值</td>
+</tr>
+<tr>
+<td>ADD</td>
+<td>加法</td>
+<td>add eax, 1</td>
+<td>eax &#x3D; eax + 1</td>
+</tr>
+<tr>
+<td>SUB</td>
+<td>减法</td>
+<td>sub eax, 2</td>
+<td>eax &#x3D; eax - 2</td>
+</tr>
+<tr>
+<td>CALL</td>
+<td>函数调用</td>
+<td>call function</td>
+<td>1.将该指令的下一条指令地址作为返回地址压入栈，2.跳转到目标函数</td>
+</tr>
+<tr>
+<td>jmp</td>
+<td>无条件跳转</td>
+<td>jmp label</td>
+<td>通过修改eip为目标地址，来转入目标函数</td>
+</tr>
+<tr>
+<td>RET</td>
+<td>恢复返回地址</td>
+<td>ret</td>
+<td>恢复返回地址，压入eip，类似于pop eip</td>
+</tr>
+</tbody></table>
+<p><code>EFLAGS</code> 是 <strong>x86 架构</strong>里的“标志寄存器”</p>
+<p>作用：<strong>记录算术&#x2F;逻辑结果的状态</strong>（供后续条件跳转用）</p>
+<p>eflags 这里展开说一下</p>
+<p>进位标志 CF (Carry Flag):  如果无符号数运算的结果的最高位产生了一个进位或者借位，那么其值为 1，否则为 0 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MOV EAX, 0xFFFFFFFF			;32 位无符号数的最大值</span><br><span class="line">ADD EAX, 1					;EAX=0 ，并且产生一个进位（CF = 1）</span><br><span class="line">JC overflow					;如果出现进位（Carry）就跳转</span><br></pre></td></tr></table></figure>
+
+<p>奇偶标志 PF (Parity Flag): 用于反应运算结果中一个数的奇偶性。如果低 8 位中 <code>1</code> 的个数是 <strong>偶数</strong> 则PF 的值为1，否则为 0</p>
+<p><strong>零标志位 ZF (Zero Flag)</strong>: 用来反映运算结果是否为 0。如果运算结果为 0 则其值为1，否则为 0</p>
+<p>符号标志 SF (Sign Flag): 用来反映运算结果的符号位，它与运算结果的最高位相同。0 表示正数，1表示负数。</p>
+<p>溢出标志 OF (Overflow Flag): 用于反映<strong>有符号数加减运算所得结果是否溢出</strong> </p>
+<p>运算结果超过当前运算位数所能表示的范围，则称为溢出。在有符号数的运算中，有如下规律：</p>
+<p>溢出是运算的数学结果超出了当前数据类型能表示的数值范围</p>
+<p>比如 8 位有符号数范围：<code>-128 ~ 127</code></p>
+<ul>
+<li>127 + 1 &#x3D; 128（数学结果），但 128 超出范围 → 有符号溢出</li>
+<li>-128 - 1 &#x3D; -129，也超出范围 → 有符号溢出</li>
+</ul>
+<p>正+正 如果结果是负数，则说明有溢出</p>
+<p>负+负 如果结果是正数，则说明有溢出</p>
+<p>正+负 永远都不会有溢出</p>
+<h3 id="常见的汇编指令"><a href="#常见的汇编指令" class="headerlink" title="常见的汇编指令"></a>常见的汇编指令</h3><h4 id="nop"><a href="#nop" class="headerlink" title="nop"></a>nop</h4><p>表示 No Operation，机器码为 0x90，没有操作数，执行这条指令时 CPU 什么事都不干。</p>
+<h4 id="push"><a href="#push" class="headerlink" title="push"></a>push</h4><p>PUSH 指令将数据压入栈中。栈指针寄存器 ESP(RSP) 自动递减。</p>
+<h4 id="pop"><a href="#pop" class="headerlink" title="pop"></a>pop</h4><p>POP 指令从栈中弹数据。栈指针寄存器 ESP(RSP) 自动递增。</p>
+<h4 id="mov"><a href="#mov" class="headerlink" title="mov"></a>mov</h4><p>MOV 指令将数据从源操作数移动到目的操作数。</p>
+<p>指令格式为 mov x1, x2。意为从 x2 移动数据到  x1。</p>
+<p>x1, x2 可以是：</p>
+<ul>
+<li><p>寄存器到寄存器</p>
+</li>
+<li><p>内存到寄存器，寄存器到内存</p>
+</li>
+<li><p>立即数到寄存器，立即数到内存</p>
+</li>
+</ul>
+<p>不能从内存直接到内存。</p>
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov eax, <span class="number">5</span>	 <span class="comment">//立即数到寄存器</span></span><br><span class="line">mov eax, [<span class="number">0x12345678</span>]	<span class="comment">//内存到寄存器，汇编中用[地址A]来表示地址A存储的内容</span></span><br><span class="line">mov eax, dword ptr [<span class="number">0x123456</span>]	<span class="comment">//从这个内存地址取出4字节到eax里</span></span><br><span class="line">mov [<span class="number">0xdeadbeef</span>], eax	<span class="comment">//寄存器到内存</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="lea"><a href="#lea" class="headerlink" title="lea"></a>lea</h4><p>LEA 指令用于取地址。</p>
+<p>指令格式为 lea x1, x2。</p>
+<p>x1 是 寄存器，x2 是内存地址，常用 [] 语法形式，意为引用求值。</p>
+<p>常用于指针运算，有时用于数值计算。</p>
+<p>例如</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">内存[<span class="number">0x1010</span>] = <span class="number">0xDEADBEEF</span></span><br><span class="line">rbx = <span class="number">0x1010</span></span><br><span class="line">rcx = <span class="number">2</span></span><br><span class="line">mov rax, [rbx] &gt;去地址 <span class="number">0x1010</span> 访问内存，把里面的值 <span class="number">0xDEADBEEF</span> 读出来。即：rax = <span class="number">0xDEADBEEF</span></span><br><span class="line">lea rax, [rbx] &gt;只取rbx的地址给rax。</span><br><span class="line">lea rax, [rbx + rcx*<span class="number">4</span> + <span class="number">8</span>] -&gt; rax = <span class="number">0x1010</span> + <span class="number">2</span>*<span class="number">4</span> + <span class="number">8</span> = <span class="number">0x1020</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="算数运算指令"><a href="#算数运算指令" class="headerlink" title="算数运算指令"></a>算数运算指令</h3><table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>功能</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>add</td>
+<td>加法</td>
+<td>add eax,ebx</td>
+</tr>
+<tr>
+<td>sub</td>
+<td>减法</td>
+<td>sub eax,ecx</td>
+</tr>
+<tr>
+<td>mul</td>
+<td>无符号乘法</td>
+<td>mul ecx</td>
+</tr>
+<tr>
+<td>imul</td>
+<td>有符号乘法</td>
+<td>imul eax,ecx</td>
+</tr>
+<tr>
+<td>div</td>
+<td>无符号除法</td>
+<td>div ecx</td>
+</tr>
+<tr>
+<td>idiv</td>
+<td>有符号除法</td>
+<td>idiv ecx</td>
+</tr>
+<tr>
+<td>inc（increase + 1）</td>
+<td>自增</td>
+<td>inc eax</td>
+</tr>
+<tr>
+<td>dec（decrease -1）</td>
+<td>自减</td>
+<td>dec eax</td>
+</tr>
+</tbody></table>
+<h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><p>ADD 指令计算加法操作。</p>
+<p>指令格式为 add x1, x2。其作用是x1+&#x3D;x2</p>
+<p>x1，x2 可以是 寄存器，x2 还可以是立即数，但二者不能同时是内存操作数。</p>
+<p>指令的计算结果将影响 eflags 寄存器，修改 OF, SF, ZF, AF, PF, CF 标志位。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add esp, <span class="number">8</span></span><br><span class="line">add eax, ebx</span><br><span class="line">add [eax], ebx</span><br></pre></td></tr></table></figure>
+
+<h4 id="sub"><a href="#sub" class="headerlink" title="sub"></a>sub</h4><p>SUB 指令计算减法操作。</p>
+<p>指令格式为 sub x1, x2。其作用是x1-&#x3D;x2</p>
+<p>x1，x2 可以是寄存器，x2 还可以是立即数，但二者不能同时是内存操作数。</p>
+<p>指令的计算结果将影响 eflags 寄存器，修改 OF, SF, ZF, AF, PF, CF 标志位。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sub esp, <span class="number">0xC</span></span><br><span class="line">sub eax, ebx</span><br><span class="line">sub [eax], ebx</span><br></pre></td></tr></table></figure>
+
+<h4 id="IMUL-MUL"><a href="#IMUL-MUL" class="headerlink" title="IMUL&#x2F;MUL"></a>IMUL&#x2F;MUL</h4><p><code>IMUL</code>：<strong>有符号</strong>乘法（按照有符号数的语义判断溢出），有单操作数 &#x2F; 双操作数 &#x2F; 三操作数等多种格式。</p>
+<p>三种指令格式：</p>
+<p>单操作数：默认被乘数在EAX，得到的 64 位结果放到 <strong>EDX:EAX</strong> 里（高 32 位在 EDX，低 32 位在 EAX）</p>
+<p>双操作数：imul dest ， src ，目标寄存器存储结果</p>
+<p>三操作数： imul dest，src ，imm ，将src *imm 的结果存入 dest</p>
+<p><img src="https://cdn.jsdelivr.net/gh/seeker-fang/Images//202512031649416.jpeg"></p>
+<p>MUL 指令是无符号乘法。</p>
+<p>操作数：默认为EAX寄存器是被乘数，操作数是乘数</p>
+<p>结果：如果是32位，低32位结果存储在EAX，高32位存储在EDX</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov eax, 5			;被乘数</span><br><span class="line">mov ecx, 3			;乘数</span><br><span class="line">mul ecx				;无符号乘法</span><br><span class="line">;结果存储在EAX（低32位），高位结果存储在EDX</span><br></pre></td></tr></table></figure>
+
+<p>最后eax&#x3D;15，edx&#x3D;0（因为乘积小于2^32，edx为0）</p>
+<p><strong>2 ^ 32 - 1 &#x3D; FFFF FFFF</strong></p>
+<h4 id="IDIV-DIV"><a href="#IDIV-DIV" class="headerlink" title="IDIV&#x2F;DIV"></a>IDIV&#x2F;DIV</h4><p>DIV指令用于实现无符号数的除法运算。(把操作数当作非负整数处理)</p>
+<p>操作数：</p>
+<ul>
+<li><p>被除数默认是EDX：EAX组成的64位整数（高32位在EDX，低32位在EAX）。</p>
+</li>
+<li><p>操作数为除数，结果：</p>
+<ul>
+<li>商存储在EAX</li>
+<li>余数存储在EDX</li>
+</ul>
+</li>
+</ul>
+<p>注意：需要确保EDX被清零（或正确设置），否则结果可能出错。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov edx,0		;高位被除数清零</span><br><span class="line">mov eax,15		;低位被除数</span><br><span class="line">mov ecx,3		;除数</span><br><span class="line">div ecx			;无符号除法，EAX = EAX / ECX，EDX = EAX % ECX</span><br></pre></td></tr></table></figure>
+
+<p>IDIV指令是实现有符号整数除法</p>
+<p>操作数：</p>
+<ul>
+<li>被除数为EDX：EAX组成的64位整数（同div）</li>
+<li>操作数为除数，结果：<ul>
+<li>商存储在EAX</li>
+<li>余数存储在EDX</li>
+</ul>
+</li>
+</ul>
+<p>这与div类似，也是需要正确设置EDX，且结果符号由操作数符号决定。确保EDX符号开启：cdq指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov eax, -15		;低位被除数</span><br><span class="line">cdq					;扩展符号位到EDX（符号扩展指令）</span><br><span class="line">mov ecx,3			;除数</span><br><span class="line">idiv ecx			;有符号除法，EAX = EAX / ECX , EDX = EAX % ECX</span><br></pre></td></tr></table></figure>
+
+<p>结果：EAX &#x3D; -5 （商）EDX&#x3D;0（余数）</p>
+<h3 id="位操作指令"><a href="#位操作指令" class="headerlink" title="位操作指令"></a>位操作指令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>说明</th>
+<th>示例指令</th>
+<th>计算逻辑</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>and</td>
+<td>按位与</td>
+<td>and eax, 0xFF</td>
+<td>两个对应的位都为1时结果才为1，否则为0</td>
+</tr>
+<tr>
+<td>or</td>
+<td>按位或</td>
+<td>or eax, ebx</td>
+<td>两个对应的位都为0时结果才为0，否则为1</td>
+</tr>
+<tr>
+<td>xor</td>
+<td>按位异或</td>
+<td>xor eax, ebx</td>
+<td>同为0，异为1</td>
+</tr>
+<tr>
+<td>not</td>
+<td>按位取反</td>
+<td>not eax</td>
+<td>1变成0，0变成1</td>
+</tr>
+<tr>
+<td>shl</td>
+<td>左移（无符号）</td>
+<td>shl eax, 1</td>
+<td>所有位向左移动1位，左移后空出的位置填充0，最左边的位丢弃</td>
+</tr>
+<tr>
+<td>shr</td>
+<td>右移（无符号）</td>
+<td>shr eax, 1</td>
+<td>所有位向右移动1位，右移后空出的位置填充0，最右边的位丢弃</td>
+</tr>
+<tr>
+<td>sal</td>
+<td>左移（有符号）</td>
+<td>sal eax, 1</td>
+<td>和shl一致</td>
+</tr>
+<tr>
+<td>sar</td>
+<td>右移（有符号）</td>
+<td>sar eax, 1</td>
+<td>所有位向右移动1位，右移后空出的位置填充符号位（即最左边的位），最右边的位丢弃</td>
+</tr>
+<tr>
+<td>rol</td>
+<td>循环左移</td>
+<td>rol eax，1</td>
+<td>所有位向左循环移动1位，最左边的位移动到最右边</td>
+</tr>
+<tr>
+<td>ror</td>
+<td>循环右移</td>
+<td>ror eax，1</td>
+<td>所有位向右循环移动1位，最右边的位移动到最左边</td>
+</tr>
+</tbody></table>
+<h4 id="AND-与运算"><a href="#AND-与运算" class="headerlink" title="AND(与运算)"></a>AND(与运算)</h4><p>AND 指令实现操作数的逻辑与运算。指令格式为 and x1, x2。</p>
+<p>x1, x2 可以是 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64, x2 还可以是立即数，但二者不能同时是内存操作数。</p>
+<p>两个输入都为1，结果才为1，否则是0</p>
+<h4 id="OR-或运算"><a href="#OR-或运算" class="headerlink" title="OR(或运算)"></a>OR(或运算)</h4><p>OR 指令实现操作数的逻辑或运算。指令格式为 or x1, x2。</p>
+<p>x1, x2 可以是 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64, x2 还可以是立即数，但二者不能同时是内存操作数。</p>
+<p>两个输入都为0，结果才为0，否则是1</p>
+<h4 id="XOR"><a href="#XOR" class="headerlink" title="XOR"></a>XOR</h4><p>XOR 指令实现操作数的异或运算。指令格式为 xor x1, x2。</p>
+<p>异或是同为0，异为1。 </p>
+<p>x1, x2 可以是 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64, x2 还可以是立即数，但二者不能同时是内存操作数。注：XOR 常用于清零运算，如 xor eax, eax，效率高。</p>
+<p>应用：</p>
+<p><strong>1.加密解密</strong></p>
+<p>明文 ^ key &#x3D; 密文</p>
+<p>密文 ^ key &#x3D; 明文</p>
+<p><strong>2.反转标志位</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xor eax, 0x1		;如果eax的最低位是1，变为0，如果是0，变为1</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.清零寄存器</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xor eax, eax		;eax清零</span><br></pre></td></tr></table></figure>
+
+<h4 id="NOT-非运算"><a href="#NOT-非运算" class="headerlink" title="NOT(非运算)"></a>NOT(非运算)</h4><p>NOT 指令实现操作数的逻辑非运算。指令格式为 not x。 x 可以取 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64。</p>
+<p>取反，0变1，1变0</p>
+<h4 id="SHL"><a href="#SHL" class="headerlink" title="SHL"></a>SHL</h4><p>SHL 指令用于实现操作数的逻辑左移运算。</p>
+<p>指令格式为 shl x1, x2： x1 可以取 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64</p>
+<p>x2 可以是 cl 或者占用 1 字节的立即数，表示左移长度</p>
+<p>0001 1010 &lt;&lt; 2 &#x3D; 0110 1000</p>
+<p><strong>x &lt;&lt; k &#x3D;&#x3D; x * 2^k</strong></p>
+<h4 id="SHR"><a href="#SHR" class="headerlink" title="SHR"></a>SHR</h4><p>SHR 指令用于实现操作数的逻辑右移运算。</p>
+<p>指令格式为 shr x1, x2： </p>
+<p>x1 可以取 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64</p>
+<p>x2 可以是 cl 或者占用 1 字节的立即数，表示右移长度</p>
+<p>注：<strong>右移运算是除以 2 的高效实现方法</strong>，被用于除法性能优化。</p>
+<h3 id="逻辑比较指令"><a href="#逻辑比较指令" class="headerlink" title="逻辑比较指令"></a>逻辑比较指令</h3><h4 id="CMP"><a href="#CMP" class="headerlink" title="CMP"></a>CMP</h4><p>CMP 指令用于两个操作数的大小比较。</p>
+<p>指令格式为 cmp x1, x2。</p>
+<p>cmp 指令通过将 x1 减去 x2 的方式实现比较，根据减法结果设置 eflags 的相应标志位，且将减法结果丢弃。</p>
+<p>cmp &lt;-&gt; sub ：</p>
+<ul>
+<li><p>以相同的方式进行减法操作，以同样的方式设置 eflags 寄存器</p>
+</li>
+<li><p>但 sub 指令将计算结果存入 x1，而 cmp 指令不保存计算结果</p>
+</li>
+</ul>
+<p>修改的 eflags 寄存器标志位有 CF, OF, SF, ZF, AF, PF。     </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mov eax, <span class="number">1</span></span><br><span class="line">mov bl, <span class="number">0x80</span></span><br><span class="line">mov cl, <span class="number">0x9</span></span><br><span class="line">cmp bl, cl</span><br><span class="line">jb label1	<span class="comment">//小于跳转</span></span><br><span class="line">mov eax, <span class="number">0</span></span><br><span class="line">label1：</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="TEST"><a href="#TEST" class="headerlink" title="TEST"></a>TEST</h4><p>TEST 指令用于两个操作数的逻辑比较。</p>
+<p>指令格式为 test x1, x2。</p>
+<p>test 指令通过计算两个操作数的逻辑与**(&amp;)**位运算实现比较操作，根据与操作的结果设置 eflags 的相应标志位，且将与操作计算结果丢弃。</p>
+<p>修改的 eflags 寄存器标志位有 SF, ZF, PF。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mov eax, <span class="number">1</span></span><br><span class="line">mov ecx, <span class="number">0x9</span></span><br><span class="line">test ecx, ecx	<span class="comment">//还是原来的0x9</span></span><br><span class="line">jz label1</span><br><span class="line">mov eax, <span class="number">0</span></span><br><span class="line">label1：</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>用途：常用于检查某位是否为0（如 TEST EAX，EAX 来判断EAX是否为0）。如果eax是0，0 and 0还是0，ZF&#x3D;1</p>
+<h3 id="控制转移指令"><a href="#控制转移指令" class="headerlink" title="控制转移指令"></a>控制转移指令</h3><h4 id="JMP-无条件跳转"><a href="#JMP-无条件跳转" class="headerlink" title="JMP(无条件跳转)"></a>JMP(无条件跳转)</h4><p>JMP 指令改变 EIP(RIP) 的值到目标地址，实现控制流跳转。</p>
+<p>指令格式为 jmp x。</p>
+<p>x 可取 imm, r&#x2F;m16, r&#x2F;m32, r&#x2F;m64 等。</p>
+<p>jmp 目标地址 x 的主要形式：</p>
+<ul>
+<li><p>短跳方式，使用相对地址</p>
+<ul>
+<li><p>相对于 jmp 指令的下一条指令，1 字节（-128 ~ 127）范围</p>
+</li>
+<li><p>例如，地址0x00401021 处指令要表示 “jmp 0x00401028”为短跳方式，就是机器码 EB 05 。内存中并没有 0x00401023这一字符串或常量，而是前跳 5 个字节。  EB-&gt;jmp</p>
+<p>假设这里使用短跳（<code>EB xx</code>），指令起始地址：<code>instr = 0x00401021</code>。</p>
+<p>短跳的长度 &#x3D; 2，所以<strong>下一条指令地址</strong>（next） &#x3D; <code>instr + 2 = 0x00401023</code>。</p>
+<p>计算相对偏移：<code>rel = dest - next = 0x00401028 - 0x00401023 = 0x05</code>（十进制 +5）。</p>
+<p>因为 +5 在 -128..+127 范围内，可以用短跳。机器码就是 <code>EB 05</code>，存入内存的是这两个字节。</p>
+<p>CPU 执行时把 <code>next</code> 加上 <code>0x05</code> 得到 <code>0x00401028</code>，跳过去。</p>
+</li>
+<li><p>某些反汇编器将其标记为 jmp short</p>
+</li>
+</ul>
+</li>
+<li><p>近跳方式，使用相对地址</p>
+<ul>
+<li>相对于 jmp 指令的下一条指令，相对地址 4 字节范围</li>
+</ul>
+</li>
+<li><p>远跳方式（段间转移）</p>
+</li>
+<li><p>绝对地址，使用直接地址</p>
+<ul>
+<li>指令中硬编码方式的内存地址</li>
+</ul>
+</li>
+<li><p>绝对地址，使用间接地址</p>
+<ul>
+<li>指令中寄存器或内存间接访问的地址</li>
+</ul>
+</li>
+</ul>
+<p>例如</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jmp eax</span><br><span class="line">jmp <span class="number">6</span>	<span class="comment">//短跳</span></span><br><span class="line">jmp <span class="number">-2</span></span><br><span class="line">jmp <span class="number">0xdeadbeef</span></span><br><span class="line">jmp [esp]	<span class="comment">//内存间接访问</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="JCC-条件跳转"><a href="#JCC-条件跳转" class="headerlink" title="JCC(条件跳转)"></a>JCC(条件跳转)</h4><p>Jcc 指令是一系列条件跳转指令的集合，该指令在指定条件满足时将控制流转向目标地址。</p>
+<p>指令格式为 jcc x。</p>
+<p>启动设置：</p>
+<ul>
+<li>比较操作设置 eflags 寄存器的标志位</li>
+<li>如 JNZ 指令，当 eflags 的 ZF 未被设置（ZF&#x3D;0）时，指令满足跳转条件，执行控制转移到目标地</li>
+</ul>
+<p>址 x </p>
+<p>几个常见 jcc 指令的判断条件：</p>
+<ul>
+<li>jz&#x2F;je：if ZF &#x3D;&#x3D; 1 （相等）跳转</li>
+<li>jnz&#x2F;jne: if ZF &#x3D;&#x3D; 0 ，（不等）跳转</li>
+<li>jg ：如果大于就跳转</li>
+<li>jl：如果小于就跳转</li>
+<li>jle&#x2F;jng: if ZF &#x3D;&#x3D; 1 or SF !&#x3D; OF</li>
+<li>jge&#x2F;jnl: if SF &#x3D;&#x3D; OF</li>
+<li>jbe: if CF &#x3D;&#x3D; 1 or ZF &#x3D;&#x3D; 1</li>
+<li>jb: if CF &#x3D;&#x3D; 1</li>
+</ul>
+<p>这些条件通过查看 eflags 寄存器的相应位进行判断。常用的设置 eflags 标志位的指令有 cmp, test运算指令等。记住几个单词的前缀就行<br>z：zero ，零</p>
+<p>e：equal，相等</p>
+<p>g：great，大</p>
+<p>l：less，小</p>
+<p>n：not，不</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mov bl, <span class="number">0x60</span></span><br><span class="line">mov eax, <span class="number">1</span></span><br><span class="line">sub bl, <span class="number">0x31</span></span><br><span class="line">jnz label1</span><br><span class="line">mov eax, <span class="number">0</span></span><br><span class="line">label1:</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="CALL"><a href="#CALL" class="headerlink" title="CALL"></a>CALL</h4><p>CALL 指令将程序控制流转向一个子函数。</p>
+<p>指令格式为 call x。</p>
+<p>x 可取 r&#x2F;m16, r&#x2F;m32, r&#x2F;m64, ptr16:16, ptr16:32。</p>
+<p>启动设置：参数传递，使用函数调用约定。</p>
+<p>具体过程：</p>
+<ol>
+<li>首先，将下一条指令的地址压入栈中，也就是push 返回地址</li>
+<li>然后，改变 EIP(RIP) 的值为 x，进入到call的内部执行，相当于jmp x</li>
+<li>执行完根据push的返回地址，返回到call下一行的执行代码（ret起作用）</li>
+</ol>
+<p>x 可以是绝对地址，也可以是相对于 CALL 指令尾的相对地址</p>
+<h4 id="LEAVE"><a href="#LEAVE" class="headerlink" title="LEAVE"></a>LEAVE</h4><p>LEAVE 指令用于子函数退出时清理栈的操作，常与 RET 指令配套使用。</p>
+<p>实际操作为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MOV ESP EBP</span><br><span class="line"></span><br><span class="line">POP EBP</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>设置 ESP(RSP) 为 EBP(RBP) </p>
+<p>将栈底指针的值赋值给栈顶指针，释放局部变量所占的栈空间。</p>
+</li>
+<li><p>弹出栈顶数据到 EBP(RBP) </p>
+<p>从栈中弹出保存的调用者的EBP值，恢复调用者的栈底指针。</p>
+</li>
+</ol>
+<h4 id="RET"><a href="#RET" class="headerlink" title="RET"></a>RET</h4><p>RET 指令将程序控制流从子函数返回到调用函数。</p>
+<p>两种指令格式：</p>
+<ul>
+<li>ret<ul>
+<li>将栈顶数据弹到 EIP(RIP)</li>
+<li>一般用于 cdecl</li>
+</ul>
+</li>
+<li>ret x<ul>
+<li>将栈顶数据弹到 EIP(RIP)</li>
+<li>ESP(RSP) +&#x3D; x</li>
+<li>一般用于 stdcall</li>
+</ul>
+</li>
+</ul>
+<h3 id="栈操作指令"><a href="#栈操作指令" class="headerlink" title="栈操作指令"></a>栈操作指令</h3><p> 32位模式下常见的栈操作指令表</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>功能描述</th>
+<th>栈指针变化（ESP）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>push</td>
+<td>将寄存器值，立即数或操作数压入栈顶。例如：push eax</td>
+<td>esp-&#x3D;4</td>
+</tr>
+<tr>
+<td>pop</td>
+<td>将栈顶的值弹出并存入到寄存器或内存操作数。例如：pop eax</td>
+<td>esp+&#x3D;4</td>
+</tr>
+<tr>
+<td>pushad</td>
+<td>按顺序将通用寄存器（eax，ecx，edx，ebx，esp，ebp，esi，edi）的值压入栈</td>
+<td>esp-&#x3D;32</td>
+</tr>
+<tr>
+<td>popad</td>
+<td>按顺序从栈中弹出值恢复到通用寄存器（edi，esi，ebp，esp，ebx，edx，ecx，eax）</td>
+<td>esp+&#x3D;32</td>
+</tr>
+<tr>
+<td>pushfd</td>
+<td>将32位标志寄存器（EFLAGS）压入栈</td>
+<td>esp-&#x3D;4</td>
+</tr>
+<tr>
+<td>popfd</td>
+<td>从栈中弹出值并恢复到32位标志寄存器（EFLAGS）</td>
+<td>esp+&#x3D;4</td>
+</tr>
+<tr>
+<td>call</td>
+<td>调用子程序，将当前指令的返回地址压入栈顶，然后跳转到目标地址。</td>
+<td>esp-&#x3D;4</td>
+</tr>
+<tr>
+<td>ret</td>
+<td>从栈中弹出返回地址并跳转到该地址</td>
+<td>esp+&#x3D;4（或更多）</td>
+</tr>
+<tr>
+<td>enter</td>
+<td>设置栈帧：将当前EBP压入栈，然后设置新的EBP并为局部变量分配空间</td>
+<td>esp-&#x3D;局部变量大小</td>
+</tr>
+<tr>
+<td>leave</td>
+<td>恢复栈帧：将EBP 的值恢复到ESP，然后弹出原EBP</td>
+<td>esp+&#x3D;局部变量大小</td>
+</tr>
+<tr>
+<td>int imm8</td>
+<td>软中断：将标志寄存器，代码段（CS）和指令指针（EIP）压入栈，然后跳转到中断向量表中的处理程序地址。</td>
+<td>esp-&#x3D;12</td>
+</tr>
+<tr>
+<td>iret</td>
+<td>中断返回：从栈中弹出标志寄存器，代码段（CS）和指令指针（EIP），恢复中断前状态</td>
+<td>esp+&#x3D;12</td>
+</tr>
+</tbody></table>
+<h3 id="字符串操作指令"><a href="#字符串操作指令" class="headerlink" title="字符串操作指令"></a>字符串操作指令</h3><h4 id="movs"><a href="#movs" class="headerlink" title="movs"></a>movs</h4><p>movs 是一组字符串操作指令的通称，表示“移动字符串数据”。它可以根据操作的数据宽度分为以下几种具体形式：</p>
+<p>1.movsb：移动一个字节（b表示byte，1字节）</p>
+<p>2.movsw：移动一个字（w 表示word，2字节）</p>
+<p>3.movsd：移动一个双字（d表示double word，4字节）</p>
+<p>4.mosvq：（64位模式下可用）：移动一个四字（q表示quad word，8字节）</p>
+<h4 id="rep"><a href="#rep" class="headerlink" title="rep"></a>rep</h4><p><strong>1.rep （repeat）</strong></p>
+<ul>
+<li>作用重复执行后续字符串操作指令（如 movsb，stosb，lodsb等），直到ECX（或CX）寄存器的值减为0。或者说ECX不断减少，且&gt;0时重复。</li>
+<li>用法：不关心条件，仅重复执行</li>
+</ul>
+<p><strong>2.<code>repe </code>或 <code>repz</code> (repeat while equal&#x2F;repeat while zero)</strong></p>
+<ul>
+<li>作用：当ZF&#x3D;1且ECX不为0时，重复执行字符串操作指令。</li>
+<li>常用于字符串比较指令（如cmpsb 或 scasb），表示“当相等时继续比较”。</li>
+</ul>
+<p> <strong>3.repne 或 repnz（repeat while not equal &#x2F; repeat while not zero）</strong></p>
+<ul>
+<li>作用：当ZF为0且ECX不为0时，重复执行字符串操作指令。</li>
+<li>常用于字符串操作指令，表示“当不相等时继续比较”。</li>
+<li>repne 和 repnz 是等价的。</li>
+</ul>
+<p><strong>rep movsb 指令</strong></p>
+<p>作用：批量复制字符串数据。</p>
+<ul>
+<li>rep 是重复指令前缀，结合movsb 一次复制一个字节。</li>
+<li>ECX 指定要复制的字节数，ESI和EDI分别为源地址和目标地址。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mov ecx, length			;设置要复制的字节数</span><br><span class="line">mov esi, source			;源字符串地址</span><br><span class="line">mov edi, destination	;目标字符串地址</span><br><span class="line">rep movsb				;批量复制字符串</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>scas 指令</strong></p>
+<p>作用：扫描字符串中的特定字符。</p>
+<ul>
+<li>扫描方向由DF（Direction Flag）决定，cld 清除DF从低地址扫描，std 设置DF 从高地址扫描。</li>
+<li>用于实现字符查找（如 strchr）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mov edi, offset str_buffer		;EDI指向要扫描的字符串</span><br><span class="line">mov al, &#x27;A&#x27;						;查找字符‘A’</span><br><span class="line">cld								;设置扫描方向为递增</span><br><span class="line">mov ecx, length_of_string		;ECX设置为字符串的长度</span><br><span class="line"></span><br><span class="line">repne scasb						;扫描直到找到‘A’或结束</span><br><span class="line">jnz	not_found					;如果未找到A，跳转到 not_found</span><br><span class="line">;找到‘A’后，继续处理</span><br></pre></td></tr></table></figure>
+
+<p><strong>stos 指令</strong></p>
+<p>作用：向目标地址填充数据</p>
+<ul>
+<li>通常用于清空字符串或填充特定值。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov edi, offset_buffer		;目标地址</span><br><span class="line">mov al, 0					;填充值为0</span><br><span class="line">mov ecx, size				;填充大小</span><br><span class="line">cld							;设置方向标志为递增</span><br><span class="line">rep stosb					;填充字符串</span><br></pre></td></tr></table></figure>
+
+<p>用途：实现 memset 或者清零操作。</p>
+<p><strong>loads 指令</strong></p>
+<p>lodsb：加载一个字节到 AL，并将 ESI 自增1。</p>
+<p>lodsw：加载一个字到 AX，并将 ESI 自增2。</p>
+<p>lodsd：加载一个双字到 EAX，并将 ESI 自增4。</p>
+<p>其中lodsb常与stosb一起使用</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yee01001100.github.io">yee01001100</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yee01001100.github.io/2026/04/18/%E6%B1%87%E7%BC%96%E8%B5%84%E6%96%99/">https://yee01001100.github.io/2026/04/18/%E6%B1%87%E7%BC%96%E8%B5%84%E6%96%99/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://yee01001100.github.io" target="_blank">yee01001100</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/04/17/Minecraft%E5%BC%80%E6%9C%8D%E6%8C%87%E5%8D%97/" title="Minecraft 1.19.4 Fabric 开服指南"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Minecraft 1.19.4 Fabric 开服指南</div></div><div class="info-2"><div class="info-item-1">Minecraft 1.19.4 Fabric 开服指南 目录 基础准备 服务端启动 网络问题深度解析 防火墙设置 server.properties详解 [Minecraft 1.19.4 服务端管理注意事项指南](#Minecraft 1.19.4 服务端管理注意事项指南) 网络诊断   基础准备 运行服务端需要一些基础准备工作，如jdk17或更高版本  以下是jdk的下载网址Oracle-jdk 安装完成后可输入以下指令验证是否安装完成 12#此指令可显示你已安装的Java版本java -version   服务端启动 确认准备完全后，即可启动服务端 请先将fabric服务端文件移至一个单独的文件夹，以下是fabric服务端文件下载地址fabric-server 请注意版本对应!   上述步骤完成后请在服务端文件所在文件夹的上方文件地址栏输入cmd以确保指令运行环境处在当前文件夹内，然后输入以下指令启动服务端 12#此处假设服务端文件名为（fabric-server-mc.1.21.5-loader.0.16.14-launcher.1.0.3.jar），请根据实际情况做适...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yee01001100</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/yee01001100"><i class="fab fa-github"></i><span>To my github</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yee01001100" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:yee01001100@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">None</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4%E4%B8%8E%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">汇编指令与寄存器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%AF%BC"><span class="toc-number">1.1.</span> <span class="toc-text">前导</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.2.</span> <span class="toc-text">寄存器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%B1%87%E7%BC%96%E6%8C%87%E4%BB%A4"><span class="toc-number">1.3.</span> <span class="toc-text">常见的汇编指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#nop"><span class="toc-number">1.3.1.</span> <span class="toc-text">nop</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#push"><span class="toc-number">1.3.2.</span> <span class="toc-text">push</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#pop"><span class="toc-number">1.3.3.</span> <span class="toc-text">pop</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mov"><span class="toc-number">1.3.4.</span> <span class="toc-text">mov</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#lea"><span class="toc-number">1.3.5.</span> <span class="toc-text">lea</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%97%E6%95%B0%E8%BF%90%E7%AE%97%E6%8C%87%E4%BB%A4"><span class="toc-number">1.4.</span> <span class="toc-text">算数运算指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.4.1.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sub"><span class="toc-number">1.4.2.</span> <span class="toc-text">sub</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IMUL-MUL"><span class="toc-number">1.4.3.</span> <span class="toc-text">IMUL&#x2F;MUL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDIV-DIV"><span class="toc-number">1.4.4.</span> <span class="toc-text">IDIV&#x2F;DIV</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4"><span class="toc-number">1.5.</span> <span class="toc-text">位操作指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AND-%E4%B8%8E%E8%BF%90%E7%AE%97"><span class="toc-number">1.5.1.</span> <span class="toc-text">AND(与运算)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#OR-%E6%88%96%E8%BF%90%E7%AE%97"><span class="toc-number">1.5.2.</span> <span class="toc-text">OR(或运算)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#XOR"><span class="toc-number">1.5.3.</span> <span class="toc-text">XOR</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NOT-%E9%9D%9E%E8%BF%90%E7%AE%97"><span class="toc-number">1.5.4.</span> <span class="toc-text">NOT(非运算)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SHL"><span class="toc-number">1.5.5.</span> <span class="toc-text">SHL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SHR"><span class="toc-number">1.5.6.</span> <span class="toc-text">SHR</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%BB%E8%BE%91%E6%AF%94%E8%BE%83%E6%8C%87%E4%BB%A4"><span class="toc-number">1.6.</span> <span class="toc-text">逻辑比较指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CMP"><span class="toc-number">1.6.1.</span> <span class="toc-text">CMP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TEST"><span class="toc-number">1.6.2.</span> <span class="toc-text">TEST</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E8%BD%AC%E7%A7%BB%E6%8C%87%E4%BB%A4"><span class="toc-number">1.7.</span> <span class="toc-text">控制转移指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#JMP-%E6%97%A0%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC"><span class="toc-number">1.7.1.</span> <span class="toc-text">JMP(无条件跳转)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#JCC-%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC"><span class="toc-number">1.7.2.</span> <span class="toc-text">JCC(条件跳转)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CALL"><span class="toc-number">1.7.3.</span> <span class="toc-text">CALL</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#LEAVE"><span class="toc-number">1.7.4.</span> <span class="toc-text">LEAVE</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RET"><span class="toc-number">1.7.5.</span> <span class="toc-text">RET</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%88%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4"><span class="toc-number">1.8.</span> <span class="toc-text">栈操作指令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C%E6%8C%87%E4%BB%A4"><span class="toc-number">1.9.</span> <span class="toc-text">字符串操作指令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#movs"><span class="toc-number">1.9.1.</span> <span class="toc-text">movs</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rep"><span class="toc-number">1.9.2.</span> <span class="toc-text">rep</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/18/%E6%B1%87%E7%BC%96%E8%B5%84%E6%96%99/" title="汇编">汇编</a><time datetime="2026-04-18T01:52:49.272Z" title="发表于 2026-04-18 09:52:49">2026-04-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/17/Minecraft%E5%BC%80%E6%9C%8D%E6%8C%87%E5%8D%97/" title="Minecraft 1.19.4 Fabric 开服指南">Minecraft 1.19.4 Fabric 开服指南</a><time datetime="2026-04-17T12:54:38.996Z" title="发表于 2026-04-17 20:54:38">2026-04-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yee01001100</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
