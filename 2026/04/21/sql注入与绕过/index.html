@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yee01001100.github.io/img/butterfly-icon.png">
 <meta property="article:published_time" content="2026-04-21T07:12:00.000Z">
-<meta property="article:modified_time" content="2026-04-21T07:12:24.948Z">
+<meta property="article:modified_time" content="2026-04-21T07:24:15.515Z">
 <meta property="article:author" content="yee01001100">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://yee01001100.github.io/img/butterfly-icon.png"><script type="application/ld+json">{
@@ -17,7 +17,7 @@
   "url": "https://yee01001100.github.io/2026/04/21/sql%E6%B3%A8%E5%85%A5%E4%B8%8E%E7%BB%95%E8%BF%87/",
   "image": "https://yee01001100.github.io/img/butterfly-icon.png",
   "datePublished": "2026-04-21T07:12:00.000Z",
-  "dateModified": "2026-04-21T07:12:24.948Z",
+  "dateModified": "2026-04-21T07:24:15.515Z",
   "author": [
     {
       "@type": "Person",
@@ -158,7 +158,7 @@
   isHighlightShrink: false,
   isToc: true,
   pageType: 'post'
-}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">sql注入与绕过</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">sql注入与绕过</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-21T07:12:00.000Z" title="发表于 2026-04-21 15:12:00">2026-04-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T07:12:24.948Z" title="更新于 2026-04-21 15:12:24">2026-04-21</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>SQL注入是通过将恶意SQL代码插入Web表单、URL参数或查询字符串中，利用应用程序对用户输入验证不足的漏洞，欺骗数据库执行非授权操作的安全威胁，其核心在于<strong>数据与指令的混淆</strong>，而绕过技术则针对安全防护机制设计，旨在规避检测规则。</p>
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">sql注入与绕过</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">sql注入与绕过</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-21T07:12:00.000Z" title="发表于 2026-04-21 15:12:00">2026-04-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-21T07:24:15.515Z" title="更新于 2026-04-21 15:24:15">2026-04-21</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>SQL注入是通过将恶意SQL代码插入Web表单、URL参数或查询字符串中，利用应用程序对用户输入验证不足的漏洞，欺骗数据库执行非授权操作的安全威胁，其核心在于<strong>数据与指令的混淆</strong>，而绕过技术则针对安全防护机制设计，旨在规避检测规则。</p>
 <h2 id="一、SQL注入原理详解"><a href="#一、SQL注入原理详解" class="headerlink" title="一、SQL注入原理详解"></a>一、SQL注入原理详解</h2><h3 id="1-根本成因"><a href="#1-根本成因" class="headerlink" title="1. 根本成因"></a>1. 根本成因</h3><ul>
 <li><strong>数据与指令混淆</strong>：应用程序将用户输入直接拼接到SQL查询中，未区分数据与指令的语义。</li>
 <li><strong>过滤不严</strong>：对特殊字符（如单引号、分号）和SQL关键字（如SELECT、UNION）未进行有效过滤或转义。</li>
@@ -170,8 +170,8 @@
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> username <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">OR</span> <span class="string">&#x27;1&#x27;</span><span class="operator">=</span><span class="string">&#x27;1&#x27;</span></span><br></pre></td></tr></table></figure>
 <p>由于<code>&#39;1&#39;=&#39;1&#39;</code>恒真，攻击者可绕过身份验证获取所有用户数据。</p>
 <h3 id="3-注入类型"><a href="#3-注入类型" class="headerlink" title="3. 注入类型"></a>3. 注入类型</h3><ul>
-<li><strong>数字型注入</strong>：参数无引号包裹（如<code>id=1</code>），直接拼接条件（<code>id=1 AND 1=2</code>）。</li>
-<li><strong>字符型注入</strong>：参数被引号包裹（如<code>name=&#39;admin&#39;</code>），需闭合引号（<code>name=&#39;admin&#39;--</code>）。</li>
+<li><strong>数字型注入</strong>：*参数无引号包裹（如<code>id=1</code>），直接拼接条件（<code>id=1 AND 1=2</code>）。</li>
+<li><strong>字符型注入</strong>：*参数被引号包裹（如<code>name=&#39;admin&#39;</code>），需闭合引号（<code>name=&#39;admin&#39;--</code>）。</li>
 <li><strong>盲注</strong>：无直接数据回显，通过布尔响应（真&#x2F;假）或时间延迟（<code>SLEEP(3)</code>）推断数据。</li>
 <li><strong>报错注入</strong>：利用数据库错误信息泄露数据（如<code>AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(0x3a,version(),0x3a) AS x FROM information_schema.tables GROUP BY x))</code>）。</li>
 </ul>
