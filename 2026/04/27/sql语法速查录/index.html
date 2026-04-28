@@ -1,0 +1,1102 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>sql语法速查录 | yee01001100</title><meta name="author" content="yee01001100"><meta name="copyright" content="yee01001100"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="以下是 MySQL 常用 SQL 语句的详细语法及参数讲解，覆盖数据库、表、数据操作、用户权限等核心命令。每条语句均提供完整语法格式与参数说明，可作日常开发的手边速查手册。  一、数据库操作1. CREATE DATABASE – 创建数据库CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] 数据库名     [CHARACTER SET 字符集]     [C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql语法速查录">
+<meta property="og:url" content="https://yee01001100.github.io/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/index.html">
+<meta property="og:site_name" content="yee01001100">
+<meta property="og:description" content="以下是 MySQL 常用 SQL 语句的详细语法及参数讲解，覆盖数据库、表、数据操作、用户权限等核心命令。每条语句均提供完整语法格式与参数说明，可作日常开发的手边速查手册。  一、数据库操作1. CREATE DATABASE – 创建数据库CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] 数据库名     [CHARACTER SET 字符集]     [C">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yee01001100.github.io/img/butterfly-icon.png">
+<meta property="article:published_time" content="2026-04-27T09:16:48.000Z">
+<meta property="article:modified_time" content="2026-04-27T09:23:32.975Z">
+<meta property="article:author" content="yee01001100">
+<meta property="article:tag" content="-sql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yee01001100.github.io/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "sql语法速查录",
+  "url": "https://yee01001100.github.io/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/",
+  "image": "https://yee01001100.github.io/img/butterfly-icon.png",
+  "datePublished": "2026-04-27T09:16:48.000Z",
+  "dateModified": "2026-04-27T09:23:32.975Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "yee01001100",
+      "url": "https://yee01001100.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yee01001100.github.io/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"none","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'sql语法速查录',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/top.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"></a><a class="nav-page-title" href="/"><span class="site-name">sql语法速查录</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">sql语法速查录</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-04-27T09:16:48.000Z" title="发表于 2026-04-27 17:16:48">2026-04-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-27T09:23:32.975Z" title="更新于 2026-04-27 17:23:32">2026-04-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%AD%E6%B3%95/">语法</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%AD%E6%B3%95/sql/">sql</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><hr>
+<p>以下是 <strong>MySQL 常用 SQL 语句的详细语法及参数讲解</strong>，覆盖数据库、表、数据操作、用户权限等核心命令。每条语句均提供<strong>完整语法格式</strong>与<strong>参数说明</strong>，可作日常开发的手边速查手册。</p>
+<hr>
+<h2 id="一、数据库操作"><a href="#一、数据库操作" class="headerlink" title="一、数据库操作"></a>一、数据库操作</h2><h3 id="1-CREATE-DATABASE-–-创建数据库"><a href="#1-CREATE-DATABASE-–-创建数据库" class="headerlink" title="1. CREATE DATABASE – 创建数据库"></a>1. CREATE DATABASE – 创建数据库</h3><pre><code class="language-sql">CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] 数据库名
+    [CHARACTER SET 字符集]
+    [COLLATE 校对规则]
+    [ENCRYPTION {&#39;Y&#39; | &#39;N&#39;}];
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>参数 &#x2F; 子句</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>DATABASE</code> 或 <code>SCHEMA</code></td>
+<td>等价，定义数据库</td>
+</tr>
+<tr>
+<td><code>IF NOT EXISTS</code></td>
+<td>仅在数据库不存在时创建，避免报错</td>
+</tr>
+<tr>
+<td><code>CHARACTER SET</code></td>
+<td>指定字符集，如 <code>utf8mb4</code>（推荐）</td>
+</tr>
+<tr>
+<td><code>COLLATE</code></td>
+<td>指定排序和比较规则，如 <code>utf8mb4_unicode_ci</code></td>
+</tr>
+<tr>
+<td><code>ENCRYPTION</code></td>
+<td>MySQL 8.0.16+ 支持，是否加密表空间（<code>Y</code>&#x2F;<code>N</code>）</td>
+</tr>
+</tbody></table>
+<p><strong>示例：</strong></p>
+<pre><code class="language-sql">CREATE DATABASE IF NOT EXISTS mydb
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_general_ci;
+</code></pre>
+<hr>
+<h3 id="2-DROP-DATABASE-–-删除数据库"><a href="#2-DROP-DATABASE-–-删除数据库" class="headerlink" title="2. DROP DATABASE – 删除数据库"></a>2. DROP DATABASE – 删除数据库</h3><pre><code class="language-sql">DROP {DATABASE | SCHEMA} [IF EXISTS] 数据库名;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>IF EXISTS</code></td>
+<td>存在才删除，避免报错</td>
+</tr>
+</tbody></table>
+<p><strong>注意</strong>：不可恢复，会删除库内所有表和数据。</p>
+<hr>
+<h3 id="3-USE-–-选择数据库"><a href="#3-USE-–-选择数据库" class="headerlink" title="3. USE – 选择数据库"></a>3. USE – 选择数据库</h3><pre><code class="language-sql">USE 数据库名;
+</code></pre>
+<p>将指定数据库设为当前作用域，后续操作无需在表名前加库名。</p>
+<hr>
+<h2 id="二、表操作-DDL"><a href="#二、表操作-DDL" class="headerlink" title="二、表操作 (DDL)"></a>二、表操作 (DDL)</h2><h3 id="1-CREATE-TABLE-–-创建表"><a href="#1-CREATE-TABLE-–-创建表" class="headerlink" title="1. CREATE TABLE – 创建表"></a>1. CREATE TABLE – 创建表</h3><pre><code class="language-sql">CREATE [TEMPORARY] TABLE [IF NOT EXISTS] 表名 (
+    列定义,
+    ...
+    [索引定义],
+    [约束定义]
+) [表选项];
+</code></pre>
+<h4 id="列定义-column-definition"><a href="#列定义-column-definition" class="headerlink" title="列定义 (column_definition)"></a>列定义 (column_definition)</h4><pre><code class="language-sql">列名 数据类型 [NOT NULL | NULL] [DEFAULT 默认值]
+    [AUTO_INCREMENT] [UNIQUE [KEY]] [PRIMARY KEY]
+    [COMMENT &#39;列注释&#39;]
+    [REFERENCES 参考表(参考列)]   -- 内联外键
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>数据类型</code></td>
+<td>如 <code>INT</code>, <code>VARCHAR(100)</code>, <code>DECIMAL(10,2)</code>, <code>DATETIME</code> 等</td>
+</tr>
+<tr>
+<td><code>NOT NULL</code></td>
+<td>列值不能为 NULL</td>
+</tr>
+<tr>
+<td><code>NULL</code></td>
+<td>允许 NULL（默认）</td>
+</tr>
+<tr>
+<td><code>DEFAULT 值</code></td>
+<td>设置默认值；若允许 NULL 且未指定，默认为 NULL</td>
+</tr>
+<tr>
+<td><code>AUTO_INCREMENT</code></td>
+<td>自动递增，通常用于整数主键；一张表只能有一个自增列，且必须被索引</td>
+</tr>
+<tr>
+<td><code>UNIQUE</code> &#x2F; <code>UNIQUE KEY</code></td>
+<td>值必须唯一，可多个 NULL（视 BDB 引擎而定）</td>
+</tr>
+<tr>
+<td><code>PRIMARY KEY</code></td>
+<td>主键，自动具有 NOT NULL + UNIQUE；一张表只能有一个主键</td>
+</tr>
+<tr>
+<td><code>COMMENT</code></td>
+<td>给列添加注释</td>
+</tr>
+<tr>
+<td><code>REFERENCES</code></td>
+<td>定义外键（仅 InnoDB 支持），简写写法</td>
+</tr>
+</tbody></table>
+<h4 id="索引和约束-表级定义"><a href="#索引和约束-表级定义" class="headerlink" title="索引和约束 (表级定义)"></a>索引和约束 (表级定义)</h4><pre><code class="language-sql">PRIMARY KEY (列1, 列2, ...)
+{INDEX | KEY} [索引名] (列1 [ASC|DESC], 列2 ...)
+UNIQUE [INDEX | KEY] [索引名] (列1, ...)
+FULLTEXT [INDEX | KEY] [索引名] (列)
+SPATIAL [INDEX | KEY] [索引名] (列)
+FOREIGN KEY [外键名] (外键列) REFERENCES 父表(父列)
+    [ON DELETE 操作] [ON UPDATE 操作]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>子句</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PRIMARY KEY</code></td>
+<td>定义复合主键</td>
+</tr>
+<tr>
+<td><code>INDEX</code> &#x2F; <code>KEY</code></td>
+<td>普通索引</td>
+</tr>
+<tr>
+<td><code>UNIQUE</code></td>
+<td>唯一索引</td>
+</tr>
+<tr>
+<td><code>FULLTEXT</code></td>
+<td>全文索引（仅 InnoDB 5.6+ 或 MyISAM）</td>
+</tr>
+<tr>
+<td><code>SPATIAL</code></td>
+<td>空间索引（仅 MyISAM 或 InnoDB 8.0+）</td>
+</tr>
+<tr>
+<td><code>FOREIGN KEY</code></td>
+<td>外键约束</td>
+</tr>
+<tr>
+<td><code>ON DELETE</code> &#x2F; <code>ON UPDATE</code></td>
+<td>指定父表数据变动时的行为：<code>CASCADE</code>（级联）、<code>SET NULL</code>、<code>RESTRICT</code>（默认）、<code>NO ACTION</code>、<code>SET DEFAULT</code></td>
+</tr>
+</tbody></table>
+<h4 id="表选项"><a href="#表选项" class="headerlink" title="表选项"></a>表选项</h4><pre><code class="language-sql">ENGINE = 存储引擎
+AUTO_INCREMENT = 初始值
+[DEFAULT] CHARACTER SET = 字符集
+[DEFAULT] COLLATE = 校对规则
+COMMENT = &#39;表注释&#39;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ENGINE</code></td>
+<td>存储引擎：<code>InnoDB</code>（默认）、<code>MyISAM</code>、<code>MEMORY</code> 等</td>
+</tr>
+<tr>
+<td><code>AUTO_INCREMENT</code></td>
+<td>设置自增列的初始值</td>
+</tr>
+<tr>
+<td><code>CHARACTER SET</code></td>
+<td>表级默认字符集，影响所有无指定字符集的文本列</td>
+</tr>
+<tr>
+<td><code>COLLATE</code></td>
+<td>表级校对规则</td>
+</tr>
+<tr>
+<td><code>COMMENT</code></td>
+<td>表注释，最多 2048 字符</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-ALTER-TABLE-–-修改表结构"><a href="#2-ALTER-TABLE-–-修改表结构" class="headerlink" title="2. ALTER TABLE – 修改表结构"></a>2. ALTER TABLE – 修改表结构</h3><pre><code class="language-sql">ALTER TABLE 表名
+    alter_specification [, alter_specification] ...
+</code></pre>
+<p>每个 <code>alter_specification</code> 可以是以下之一：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>语法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>添加列</td>
+<td><code>ADD [COLUMN] 列定义 [FIRST | AFTER 列名]</code></td>
+<td>指定位置 <code>FIRST</code> 或 <code>AFTER</code></td>
+</tr>
+<tr>
+<td>删除列</td>
+<td><code>DROP [COLUMN] 列名</code></td>
+<td></td>
+</tr>
+<tr>
+<td>修改列定义</td>
+<td><code>MODIFY [COLUMN] 列名 新数据类型 [约束] [FIRST | AFTER]</code></td>
+<td>可更改数据类型、约束等</td>
+</tr>
+<tr>
+<td>重命名并修改列</td>
+<td><code>CHANGE [COLUMN] 旧列名 新列名 新数据类型 [约束]</code></td>
+<td>可同时修改列名和定义</td>
+</tr>
+<tr>
+<td>添加主键</td>
+<td><code>ADD PRIMARY KEY (列名...)</code></td>
+<td></td>
+</tr>
+<tr>
+<td>删除主键</td>
+<td><code>DROP PRIMARY KEY</code></td>
+<td></td>
+</tr>
+<tr>
+<td>添加外键</td>
+<td>&#96;ADD CONSTRAINT 约束名 FOREIGN KEY (列) REFERENCES 父表(列) [ON DELETE</td>
+<td>UPDATE …]&#96;</td>
+</tr>
+<tr>
+<td>删除外键</td>
+<td><code>DROP FOREIGN KEY 约束名</code></td>
+<td></td>
+</tr>
+<tr>
+<td>添加索引</td>
+<td><code>ADD {INDEX|KEY} [索引名] (列...);</code> 或 <code>ADD UNIQUE [INDEX|KEY] ...</code></td>
+<td></td>
+</tr>
+<tr>
+<td>删除索引</td>
+<td><code>DROP {INDEX|KEY} 索引名</code></td>
+<td>唯一索引也用 DROP INDEX</td>
+</tr>
+<tr>
+<td>重命名表</td>
+<td><code>RENAME [TO|AS] 新表名</code></td>
+<td></td>
+</tr>
+<tr>
+<td>修改表选项</td>
+<td><code>ENGINE=..., COMMENT=..., ...</code></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3-DROP-TABLE-TRUNCATE-TABLE"><a href="#3-DROP-TABLE-TRUNCATE-TABLE" class="headerlink" title="3. DROP TABLE &#x2F; TRUNCATE TABLE"></a>3. DROP TABLE &#x2F; TRUNCATE TABLE</h3><pre><code class="language-sql">DROP [TEMPORARY] TABLE [IF EXISTS] 表名 [, 表名...] [RESTRICT | CASCADE];
+TRUNCATE [TABLE] 表名;
+</code></pre>
+<ul>
+<li><code>DROP TABLE</code> 会删除表结构和数据，<code>IF EXISTS</code> 防止报错。</li>
+<li><code>RESTRICT</code> 和 <code>CASCADE</code> 在 MySQL 中无实际作用（为兼容保留）。</li>
+<li><code>TRUNCATE TABLE</code> 清空表数据并重置自增值，不可回滚（InnoDB 下 DDL 隐式提交），比 <code>DELETE</code> 快（逐行删除）。</li>
+</ul>
+<hr>
+<h2 id="三、数据操作-DML"><a href="#三、数据操作-DML" class="headerlink" title="三、数据操作 (DML)"></a>三、数据操作 (DML)</h2><h3 id="1-INSERT-–-插入数据"><a href="#1-INSERT-–-插入数据" class="headerlink" title="1. INSERT – 插入数据"></a>1. INSERT – 插入数据</h3><pre><code class="language-sql">INSERT [LOW_PRIORITY | DELAYED | HIGH_PRIORITY] [IGNORE]
+    [INTO] 表名 [(列1, 列2, ...)]
+    {VALUES | VALUE} (值1, 值2, ...) [, (...)]
+    [ON DUPLICATE KEY UPDATE 列 = 值, ...];
+-- 或
+INSERT [INTO] 表名 SET 列1=值1, 列2=值2 ...;
+-- 或
+INSERT [INTO] 表名 SELECT ...;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>选项 &#x2F; 子句</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>LOW_PRIORITY</code></td>
+<td>低优先级，等待其他读取完成再插入（仅 MyISAM）</td>
+</tr>
+<tr>
+<td><code>DELAYED</code></td>
+<td>延迟插入，立即返回，后台批量写入（仅 MyISAM）</td>
+</tr>
+<tr>
+<td><code>HIGH_PRIORITY</code></td>
+<td>高优先级，优先执行</td>
+</tr>
+<tr>
+<td><code>IGNORE</code></td>
+<td>忽略插入时的错误（如唯一键冲突），会将插入失败的行转为警告</td>
+</tr>
+<tr>
+<td><code>ON DUPLICATE KEY UPDATE</code></td>
+<td>唯一键冲突时执行更新操作，常用于“存在则更新否则插入”</td>
+</tr>
+</tbody></table>
+<p><strong>示例（多行插入）：</strong></p>
+<pre><code class="language-sql">INSERT INTO users (name, email) VALUES
+    (&#39;Alice&#39;, &#39;alice@example.com&#39;),
+    (&#39;Bob&#39;, &#39;bob@example.com&#39;)
+ON DUPLICATE KEY UPDATE email = VALUES(email);
+</code></pre>
+<hr>
+<h3 id="2-UPDATE-–-更新数据"><a href="#2-UPDATE-–-更新数据" class="headerlink" title="2. UPDATE – 更新数据"></a>2. UPDATE – 更新数据</h3><pre><code class="language-sql">UPDATE [LOW_PRIORITY] [IGNORE] 表名
+    SET 列1 = 值1, 列2 = 值2, ...
+    [WHERE 条件]
+    [ORDER BY ...]
+    [LIMIT 行数];
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>LOW_PRIORITY</code></td>
+<td>低优先级更新（MyISAM）</td>
+</tr>
+<tr>
+<td><code>IGNORE</code></td>
+<td>忽略错误（如唯一键冲突）</td>
+</tr>
+<tr>
+<td><code>ORDER BY</code></td>
+<td>指定更新顺序（与 LIMIT 配合）</td>
+</tr>
+<tr>
+<td><code>LIMIT</code></td>
+<td>限制最大更新行数</td>
+</tr>
+</tbody></table>
+<p><strong>多表更新：</strong></p>
+<pre><code class="language-sql">UPDATE 表1 JOIN 表2 ON 条件 SET 表1.列 = 值 WHERE 进一步条件;
+</code></pre>
+<hr>
+<h3 id="3-DELETE-–-删除数据"><a href="#3-DELETE-–-删除数据" class="headerlink" title="3. DELETE – 删除数据"></a>3. DELETE – 删除数据</h3><pre><code class="language-sql">DELETE [LOW_PRIORITY] [QUICK] [IGNORE]
+    FROM 表名
+    [WHERE 条件]
+    [ORDER BY ...]
+    [LIMIT 行数];
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>QUICK</code></td>
+<td>仅适用于 MyISAM，合并删除时跳过索引树的合并步骤</td>
+</tr>
+<tr>
+<td><code>IGNORE</code></td>
+<td>忽略删除时的错误</td>
+</tr>
+</tbody></table>
+<p><strong>多表删除：</strong></p>
+<pre><code class="language-sql">DELETE 表1, 表2 FROM 表1 JOIN 表2 ON 条件 WHERE ...;
+-- 或
+DELETE FROM 表1 USING 表1 JOIN 表2 ON 条件 WHERE ...;
+</code></pre>
+<hr>
+<h3 id="4-SELECT-–-查询数据（核心）"><a href="#4-SELECT-–-查询数据（核心）" class="headerlink" title="4. SELECT – 查询数据（核心）"></a>4. SELECT – 查询数据（核心）</h3><p>完整语法从句序：</p>
+<pre><code class="language-sql">SELECT [ALL | DISTINCT | DISTINCTROW]
+    [HIGH_PRIORITY]
+    [SQL_CACHE | SQL_NO_CACHE]
+    [SQL_CALC_FOUND_ROWS]
+    选择表达式, ...
+FROM 表引用
+[WHERE 条件]
+[GROUP BY {列名 | 表达式 | 位置} [ASC | DESC], ... [WITH ROLLUP]]
+[HAVING 分组过滤条件]
+[ORDER BY {列名 | 表达式 | 位置} [ASC | DESC], ...]
+[LIMIT {[偏移,] 行数 | 行数 OFFSET 偏移}]
+[FOR {UPDATE | SHARE} [OF 表] [NOWAIT | SKIP LOCKED]]
+[INTO OUTFILE &#39;文件&#39; ... | INTO 变量 ...]
+</code></pre>
+<p><strong>FROM 子句</strong> 支持：单表、多表（逗号分隔）、JOIN 语句、子查询派生表、表别名。</p>
+<p><strong>JOIN 语法：</strong></p>
+<pre><code class="language-sql">表1 [INNER | LEFT [OUTER] | RIGHT [OUTER] | CROSS] JOIN 表2
+    ON 连接条件
+    | USING (公共列名)   -- 要求列名相同
+[NATURAL [LEFT | RIGHT] JOIN 表2]   -- 自动按同名列连接
+</code></pre>
+<p><strong>WHERE 常用运算符：</strong></p>
+<ul>
+<li>比较：<code>=</code>, <code>&lt;&gt;</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></li>
+<li>逻辑：<code>AND</code>, <code>OR</code>, <code>NOT</code></li>
+<li>范围：<code>BETWEEN 小值 AND 大值</code>, <code>NOT BETWEEN</code></li>
+<li>集合：<code>IN (值1, 值2, ...)</code>, <code>NOT IN</code></li>
+<li>模糊匹配：<code>LIKE &#39;模式&#39;</code>（<code>%</code> 任意多字符，<code>_</code> 单个字符），可使用 <code>ESCAPE</code> 定义转义符</li>
+<li>正则：<code>REGEXP &#39;正则表达式&#39;</code> 或 <code>NOT REGEXP</code></li>
+<li>空值：<code>IS NULL</code>, <code>IS NOT NULL</code></li>
+<li>安全等于（可比较NULL）：<code>&lt;=&gt; NULL</code></li>
+</ul>
+<p><strong>GROUP BY 与聚合函数：</strong></p>
+<ul>
+<li>聚合函数：<code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MAX()</code>, <code>MIN()</code>, <code>GROUP_CONCAT()</code> 等。</li>
+<li><code>WITH ROLLUP</code>：在分组统计后添加总计行。</li>
+</ul>
+<p><strong>HAVING</strong>：对分组后的结果过滤（不能用WHERE的地方，使用聚合函数条件）。</p>
+<p><strong>ORDER BY</strong>：排序，可指定 <code>ASC</code>（升序，默认）或 <code>DESC</code>（降序），支持多列。</p>
+<p><strong>LIMIT</strong>：</p>
+<ul>
+<li><code>LIMIT 计数</code> – 返回前 N 条。</li>
+<li><code>LIMIT 偏移, 计数</code> – 从第偏移条开始（偏移从0开始）。</li>
+<li><code>LIMIT 计数 OFFSET 偏移</code> – 功能同上。</li>
+</ul>
+<p><strong>FOR UPDATE &#x2F; FOR SHARE</strong>：行级锁定。</p>
+<ul>
+<li><code>FOR UPDATE</code>：排他锁，允许读取并更新，防止其他事务修改。</li>
+<li><code>FOR SHARE</code>（MySQL 8.0+，同 <code>LOCK IN SHARE MODE</code>）：共享锁，允许读取，阻止其他事务排他锁。</li>
+<li><code>NOWAIT</code>：如果锁不可得立即报错；<code>SKIP LOCKED</code>：跳过已锁定的行。</li>
+</ul>
+<hr>
+<h2 id="四、用户和权限管理-DCL"><a href="#四、用户和权限管理-DCL" class="headerlink" title="四、用户和权限管理 (DCL)"></a>四、用户和权限管理 (DCL)</h2><h3 id="1-CREATE-USER-–-创建用户"><a href="#1-CREATE-USER-–-创建用户" class="headerlink" title="1. CREATE USER – 创建用户"></a>1. CREATE USER – 创建用户</h3><pre><code class="language-sql">CREATE USER [IF NOT EXISTS]
+    用户名@主机名 [IDENTIFIED BY &#39;密码&#39;]
+    [IDENTIFIED WITH auth_plugin [BY &#39;密码&#39;]]
+    [DEFAULT ROLE 角色]
+    [REQUIRE {NONE | SSL | X509 | ISSUER 颁发者 ...}]
+    [WITH {MAX_QUERIES_PER_HOUR n | MAX_UPDATES_PER_HOUR n
+          | MAX_CONNECTIONS_PER_HOUR n | MAX_USER_CONNECTIONS n
+          | PASSWORD EXPIRE INTERVAL n DAY | PASSWORD HISTORY DEFAULT
+          | ACCOUNT LOCK | ACCOUNT UNLOCK}]
+    [COMMENT &#39;注释&#39;];
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>参数 &#x2F; 子句</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>用户名@主机名</code></td>
+<td>主机名可以是 <code>&#39;localhost&#39;</code>（仅本地），<code>&#39;%&#39;</code>（所有IP），具体IP或域名</td>
+</tr>
+<tr>
+<td><code>IDENTIFIED BY &#39;密码&#39;</code></td>
+<td>指定密码，密码受密码策略影响</td>
+</tr>
+<tr>
+<td><code>IDENTIFIED WITH auth_plugin</code></td>
+<td>指定认证插件，如 <code>mysql_native_password</code> 或 <code>caching_sha2_password</code>（8.0默认）或 <code>auth_socket</code></td>
+</tr>
+<tr>
+<td><code>DEFAULT ROLE</code></td>
+<td>分配默认角色（MySQL 8.0+）</td>
+</tr>
+<tr>
+<td><code>REQUIRE</code></td>
+<td>要求 SSL 或证书，<code>NONE</code> 表示无要求</td>
+</tr>
+<tr>
+<td><code>WITH</code> 选项</td>
+<td>资源限制：每小时查询&#x2F;更新&#x2F;连接次数，最大同时连接数，密码过期策略，密码历史记录，账户锁定&#x2F;解锁</td>
+</tr>
+<tr>
+<td><code>COMMENT</code></td>
+<td>用户注释</td>
+</tr>
+</tbody></table>
+<p><strong>示例（允许远程，使用强密码）：</strong></p>
+<pre><code class="language-sql">CREATE USER &#39;admin&#39;@&#39;%&#39; IDENTIFIED BY &#39;MyStr0ng@Pass&#39;;
+</code></pre>
+<hr>
+<h3 id="2-GRANT-–-授予权限"><a href="#2-GRANT-–-授予权限" class="headerlink" title="2. GRANT – 授予权限"></a>2. GRANT – 授予权限</h3><pre><code class="language-sql">GRANT
+    权限1, 权限2, ...
+    [ON {数据库.* | 数据库.表 | *.* | 表}]
+    TO 用户名@主机 [, 用户...]
+    [WITH GRANT OPTION]
+    [AS 以某用户身份执行...];
+</code></pre>
+<p><strong>常见权限列表：</strong></p>
+<ul>
+<li>全局：<code>ALL [PRIVILEGES]</code>, <code>CREATE</code>, <code>DROP</code>, <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>INDEX</code>, <code>ALTER</code>, <code>CREATE VIEW</code>, <code>SHOW VIEW</code>, <code>GRANT OPTION</code>, <code>RELOAD</code>, <code>SHUTDOWN</code>, <code>PROCESS</code>, <code>SUPER</code>, <code>REPLICATION SLAVE</code> 等。</li>
+<li>特定对象：<code>EXECUTE</code> (存储过程)、<code>TRIGGER</code>、<code>EVENT</code> 等。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>子句</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ON</code></td>
+<td>指定权限作用的对象：<code>*.*</code> 全局，<code>db.*</code> 某库所有表，<code>db.table</code> 特定表</td>
+</tr>
+<tr>
+<td><code>WITH GRANT OPTION</code></td>
+<td>允许被授权者将获得的权限再授予他人</td>
+</tr>
+<tr>
+<td><code>AS</code></td>
+<td>用于 GRANT 语句中模拟另一个用户（不常用）</td>
+</tr>
+</tbody></table>
+<p><strong>示例：</strong></p>
+<pre><code class="language-sql">GRANT SELECT, INSERT, UPDATE, DELETE ON mydb.* TO &#39;webuser&#39;@&#39;%&#39;;
+</code></pre>
+<hr>
+<h3 id="3-REVOKE-–-撤销权限"><a href="#3-REVOKE-–-撤销权限" class="headerlink" title="3. REVOKE – 撤销权限"></a>3. REVOKE – 撤销权限</h3><pre><code class="language-sql">REVOKE
+    权限1, 权限2, ...
+    ON 对象
+    FROM 用户名@主机 [, 用户...];
+</code></pre>
+<hr>
+<h3 id="4-ALTER-USER-–-修改用户"><a href="#4-ALTER-USER-–-修改用户" class="headerlink" title="4. ALTER USER – 修改用户"></a>4. ALTER USER – 修改用户</h3><pre><code class="language-sql">ALTER USER [IF EXISTS]
+    用户名@主机
+    [IDENTIFIED BY &#39;新密码&#39; | IDENTIFIED WITH 插件]
+    [DEFAULT ROLE ...]
+    [PASSWORD EXPIRE {NEVER | DEFAULT | INTERVAL n DAY}]
+    [ACCOUNT {LOCK | UNLOCK}]
+    ...;
+</code></pre>
+<p>常用于修改密码、锁定账户等。</p>
+<hr>
+<h3 id="5-DROP-USER-–-删除用户"><a href="#5-DROP-USER-–-删除用户" class="headerlink" title="5. DROP USER – 删除用户"></a>5. DROP USER – 删除用户</h3><pre><code class="language-sql">DROP USER [IF EXISTS] 用户名@主机 [, 用户名@主机 ...];
+</code></pre>
+<hr>
+<h3 id="6-其他权限相关命令"><a href="#6-其他权限相关命令" class="headerlink" title="6. 其他权限相关命令"></a>6. 其他权限相关命令</h3><ul>
+<li><code>SHOW GRANTS FOR 用户</code>：查看用户权限。</li>
+<li><code>FLUSH PRIVILEGES</code>：让权限变更立即生效（GRANT&#x2F;REVOKE 自动刷新，但直接修改 <code>mysql.user</code> 表后需要手动执行）。</li>
+</ul>
+<hr>
+<h2 id="五、事务控制-TCL"><a href="#五、事务控制-TCL" class="headerlink" title="五、事务控制 (TCL)"></a>五、事务控制 (TCL)</h2><pre><code class="language-sql">-- 开启事务
+START TRANSACTION [WITH CONSISTENT SNAPSHOT];
+BEGIN [WORK];   -- BEGIN 与 START TRANSACTION 几乎等价
+
+-- 提交
+COMMIT [WORK] [AND [NO] CHAIN] [[NO] RELEASE];
+
+-- 回滚
+ROLLBACK [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+    [TO [SAVEPOINT] 保存点名];
+
+-- 设置保存点
+SAVEPOINT 标识符;
+
+-- 释放保存点
+RELEASE SAVEPOINT 标识符;
+
+-- 设置事务隔离级别（全局/会话）
+SET [GLOBAL | SESSION] TRANSACTION ISOLATION LEVEL
+    {READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE};
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>WITH CONSISTENT SNAPSHOT</code></td>
+<td>为 InnoDB 开启一致性快照读</td>
+</tr>
+<tr>
+<td><code>AND CHAIN</code> &#x2F; <code>NO CHAIN</code></td>
+<td>提交&#x2F;回滚后是否立即开始新事务（默认 NO CHAIN）</td>
+</tr>
+<tr>
+<td><code>RELEASE</code> &#x2F; <code>NO RELEASE</code></td>
+<td>完成后是否断开会话连接</td>
+</tr>
+<tr>
+<td><code>TO SAVEPOINT</code></td>
+<td>回滚到指定保存点</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、其他常用命令"><a href="#六、其他常用命令" class="headerlink" title="六、其他常用命令"></a>六、其他常用命令</h2><pre><code class="language-sql">-- 查看表结构
+DESCRIBE 表名;    -- 或 DESC 表名
+SHOW CREATE TABLE 表名;
+
+-- 查看表索引
+SHOW INDEX FROM 表名;
+
+-- 查看所有表
+SHOW TABLES [FROM 数据库];
+
+-- 查看变量
+SHOW VARIABLES LIKE &#39;%pattern%&#39;;
+
+-- 查看状态
+SHOW STATUS LIKE &#39;%pattern%&#39;;
+
+-- 执行计划
+EXPLAIN [FORMAT=JSON] SELECT ...;   -- 分析查询
+EXPLAIN ANALYZE SELECT ...;         -- MySQL 8.0.18+ 实际执行并返回时间
+
+-- 清屏（mysql 客户端）
+system clear;   -- 或 \! clear
+</code></pre>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yee01001100.github.io">yee01001100</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yee01001100.github.io/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/">https://yee01001100.github.io/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://yee01001100.github.io" target="_blank">yee01001100</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/sql/">-sql</a></div><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/04/26/JAVA%E8%AF%AD%E6%B3%95%E9%9B%86/" title="JAVA语法集"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">JAVA语法集</div></div><div class="info-2"><div class="info-item-1"> Java 语法完整参考手册1. 基本结构1.1 源文件组织一个 Java 源文件通常包含以下部分（按顺序）：  包声明（可选） 导入语句（可选） 类&#x2F;接口&#x2F;枚举&#x2F;记录定义（至少一个）  // 包声明（必须放在第一行，注释除外） package com.example.myapp;  // 导入其他包中的类 import java.util.List; import java.util.ArrayList;  // 可选：静态导入，导入静态成员 import static java.lang.Math.PI;  // 类定义（每个文件最多有一个 public 类，且类名与文件名相同） public class MyClass {     // 类体 }  1.2 程序入口点Java 应用程序的入口是 main 方法，签名固定为： public static void main(String[] args) {     // 程序开始执行的地方 }   public：该方法可以被任何代码调用 static：属于类本身，无需创建对象即可调用 void：不...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yee01001100</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/yee01001100"><i class="fab fa-github"></i><span>To my github</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yee01001100" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:yee01001100@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">None</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">一、数据库操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-CREATE-DATABASE-%E2%80%93-%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-number">1.1.</span> <span class="toc-text">1. CREATE DATABASE – 创建数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-DROP-DATABASE-%E2%80%93-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-number">1.2.</span> <span class="toc-text">2. DROP DATABASE – 删除数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-USE-%E2%80%93-%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-number">1.3.</span> <span class="toc-text">3. USE – 选择数据库</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E8%A1%A8%E6%93%8D%E4%BD%9C-DDL"><span class="toc-number">2.</span> <span class="toc-text">二、表操作 (DDL)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-CREATE-TABLE-%E2%80%93-%E5%88%9B%E5%BB%BA%E8%A1%A8"><span class="toc-number">2.1.</span> <span class="toc-text">1. CREATE TABLE – 创建表</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%97%E5%AE%9A%E4%B9%89-column-definition"><span class="toc-number">2.1.1.</span> <span class="toc-text">列定义 (column_definition)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%92%8C%E7%BA%A6%E6%9D%9F-%E8%A1%A8%E7%BA%A7%E5%AE%9A%E4%B9%89"><span class="toc-number">2.1.2.</span> <span class="toc-text">索引和约束 (表级定义)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%A8%E9%80%89%E9%A1%B9"><span class="toc-number">2.1.3.</span> <span class="toc-text">表选项</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-ALTER-TABLE-%E2%80%93-%E4%BF%AE%E6%94%B9%E8%A1%A8%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.</span> <span class="toc-text">2. ALTER TABLE – 修改表结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-DROP-TABLE-TRUNCATE-TABLE"><span class="toc-number">2.3.</span> <span class="toc-text">3. DROP TABLE &#x2F; TRUNCATE TABLE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E6%93%8D%E4%BD%9C-DML"><span class="toc-number">3.</span> <span class="toc-text">三、数据操作 (DML)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-INSERT-%E2%80%93-%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="toc-number">3.1.</span> <span class="toc-text">1. INSERT – 插入数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-UPDATE-%E2%80%93-%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="toc-number">3.2.</span> <span class="toc-text">2. UPDATE – 更新数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-DELETE-%E2%80%93-%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="toc-number">3.3.</span> <span class="toc-text">3. DELETE – 删除数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-SELECT-%E2%80%93-%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE%EF%BC%88%E6%A0%B8%E5%BF%83%EF%BC%89"><span class="toc-number">3.4.</span> <span class="toc-text">4. SELECT – 查询数据（核心）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E7%94%A8%E6%88%B7%E5%92%8C%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-DCL"><span class="toc-number">4.</span> <span class="toc-text">四、用户和权限管理 (DCL)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-CREATE-USER-%E2%80%93-%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="toc-number">4.1.</span> <span class="toc-text">1. CREATE USER – 创建用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-GRANT-%E2%80%93-%E6%8E%88%E4%BA%88%E6%9D%83%E9%99%90"><span class="toc-number">4.2.</span> <span class="toc-text">2. GRANT – 授予权限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-REVOKE-%E2%80%93-%E6%92%A4%E9%94%80%E6%9D%83%E9%99%90"><span class="toc-number">4.3.</span> <span class="toc-text">3. REVOKE – 撤销权限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-ALTER-USER-%E2%80%93-%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7"><span class="toc-number">4.4.</span> <span class="toc-text">4. ALTER USER – 修改用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-DROP-USER-%E2%80%93-%E5%88%A0%E9%99%A4%E7%94%A8%E6%88%B7"><span class="toc-number">4.5.</span> <span class="toc-text">5. DROP USER – 删除用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E5%85%B6%E4%BB%96%E6%9D%83%E9%99%90%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4"><span class="toc-number">4.6.</span> <span class="toc-text">6. 其他权限相关命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6-TCL"><span class="toc-number">5.</span> <span class="toc-text">五、事务控制 (TCL)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%85%B6%E4%BB%96%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">6.</span> <span class="toc-text">六、其他常用命令</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/" title="sql语法速查录">sql语法速查录</a><time datetime="2026-04-27T09:16:48.000Z" title="发表于 2026-04-27 17:16:48">2026-04-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/26/JAVA%E8%AF%AD%E6%B3%95%E9%9B%86/" title="JAVA语法集">JAVA语法集</a><time datetime="2026-04-26T12:50:11.000Z" title="发表于 2026-04-26 20:50:11">2026-04-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/26/mysql-server%E5%9C%A8ubuntu%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8/" title="mysql-server在ubuntu的安装与基础使用">mysql-server在ubuntu的安装与基础使用</a><time datetime="2026-04-26T12:22:59.000Z" title="发表于 2026-04-26 20:22:59">2026-04-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/22/20260422%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97/" title="20260422更新日志">20260422更新日志</a><time datetime="2026-04-22T12:24:43.000Z" title="发表于 2026-04-22 20:24:43">2026-04-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/04/21/sql%E6%B3%A8%E5%85%A5%E4%B8%8E%E7%BB%95%E8%BF%87/" title="sql注入与绕过">sql注入与绕过</a><time datetime="2026-04-21T07:12:00.000Z" title="发表于 2026-04-21 15:12:00">2026-04-21</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yee01001100</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const parseViewBox = viewBox => {
+    if (!viewBox) return null
+    const parts = viewBox.trim().split(/[\s,]+/).map(n => Number(n))
+    if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return null
+    return parts
+  }
+
+  const getSvgViewBox = svg => {
+    const attr = parseViewBox(svg.getAttribute('viewBox'))
+    if (attr) return attr
+
+    // Fallback: use bbox to build a viewBox
+    try {
+      const bbox = svg.getBBox()
+      if (bbox && bbox.width && bbox.height) return [bbox.x, bbox.y, bbox.width, bbox.height]
+    } catch (e) {
+      // getBBox may fail on some edge cases; ignore
+    }
+
+    const w = Number(svg.getAttribute('width')) || 0
+    const h = Number(svg.getAttribute('height')) || 0
+    if (w > 0 && h > 0) return [0, 0, w, h]
+    return [0, 0, 100, 100]
+  }
+
+  const setSvgViewBox = (svg, vb) => {
+    svg.setAttribute('viewBox', `${vb[0]} ${vb[1]} ${vb[2]} ${vb[3]}`)
+  }
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+  const openSvgInNewTab = ({ source, initViewBox }) => {
+    const getClonedSvg = () => {
+      if (typeof source === 'string') {
+        const template = document.createElement('template')
+        template.innerHTML = source.trim()
+        const svg = template.content.querySelector('svg')
+        return svg ? svg.cloneNode(true) : null
+      }
+      if (source && typeof source.cloneNode === 'function') {
+        return source.cloneNode(true)
+      }
+      return null
+    }
+
+    const clone = getClonedSvg()
+    if (!clone) return
+    if (initViewBox && initViewBox.length === 4) {
+      clone.setAttribute('viewBox', initViewBox.join(' '))
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    if (!clone.getAttribute('xmlns:xlink') && clone.outerHTML.includes('xlink:')) {
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+    }
+    // inject background to match current theme
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    const bg = getComputedStyle(document.body).backgroundColor || (isDark ? '#1e1e1e' : '#ffffff')
+    if (!clone.style.background) clone.style.background = bg
+
+    const serializer = new XMLSerializer()
+    const svgSource = serializer.serializeToString(clone)
+    const htmlSource = `<!doctype html><html><head><meta charset="utf-8" />
+      <style>
+        html, body { width: 100%; height: 100%; margin: 0; display: flex; align-items: center; justify-content: center; background: ${bg}; }
+        svg { max-width: 100%; max-height: 100%; height: auto; width: auto; }
+      </style>
+      </head><body>${svgSource}</body></html>`
+    const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 30000)
+  }
+
+  const attachMermaidViewerButton = wrap => {
+    let btn = wrap.querySelector('.mermaid-open-btn')
+    if (!btn) {
+      btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'mermaid-open-btn'
+      wrap.appendChild(btn)
+    }
+
+    btn.innerHTML = '<i class="fa fa-search fa-fw" aria-hidden="true"></i>'
+
+    if (!btn.__mermaidViewerBound) {
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        e.stopPropagation()
+        const svg = wrap.__mermaidOriginalSvg || wrap.querySelector('svg')
+        if (!svg) return
+        const initViewBox = wrap.__mermaidInitViewBox
+        if (typeof svg === 'string') {
+          openSvgInNewTab({ source: svg, initViewBox })
+          return
+        }
+        openSvgInNewTab({ source: svg, initViewBox })
+      })
+      btn.__mermaidViewerBound = true
+    }
+  }
+
+  // Zoom around a point (px, py) in the SVG viewport (in viewBox coordinates)
+  const zoomAtPoint = (vb, factor, px, py) => {
+    const w = vb[2] * factor
+    const h = vb[3] * factor
+    const nx = px - (px - vb[0]) * factor
+    const ny = py - (py - vb[1]) * factor
+    return [nx, ny, w, h]
+  }
+
+  const initMermaidGestures = wrap => {
+    const svg = wrap.querySelector('svg')
+    if (!svg) return
+
+    // Ensure viewBox exists so gestures always work
+    const initVb = getSvgViewBox(svg)
+    wrap.__mermaidInitViewBox = initVb
+    wrap.__mermaidCurViewBox = initVb.slice()
+    setSvgViewBox(svg, initVb)
+
+    // Avoid binding multiple times on themeChange/pjax
+    if (wrap.__mermaidGestureBound) return
+    wrap.__mermaidGestureBound = true
+
+    // Helper: map client (viewport) coordinate -> viewBox coordinate
+    const clientToViewBox = (clientX, clientY) => {
+      const rect = svg.getBoundingClientRect()
+      const vb = wrap.__mermaidCurViewBox || getSvgViewBox(svg)
+      const x = vb[0] + (clientX - rect.left) * (vb[2] / rect.width)
+      const y = vb[1] + (clientY - rect.top) * (vb[3] / rect.height)
+      return { x, y, rect, vb }
+    }
+
+    const state = {
+      pointers: new Map(),
+      startVb: null,
+      startDist: 0,
+      startCenter: null
+    }
+
+    const clampVb = vb => {
+      const init = wrap.__mermaidInitViewBox || vb
+      const minW = init[2] * 0.1
+      const maxW = init[2] * 10
+      const minH = init[3] * 0.1
+      const maxH = init[3] * 10
+      vb[2] = clamp(vb[2], minW, maxW)
+      vb[3] = clamp(vb[3], minH, maxH)
+      return vb
+    }
+
+    const setCurVb = vb => {
+      vb = clampVb(vb)
+      wrap.__mermaidCurViewBox = vb
+      setSvgViewBox(svg, vb)
+    }
+
+    const onPointerDown = e => {
+      // Allow only primary button for mouse
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      svg.setPointerCapture(e.pointerId)
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      if (state.pointers.size === 1) {
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      } else if (state.pointers.size === 2) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        state.startDist = Math.hypot(dx, dy)
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        state.startCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      }
+    }
+
+    const onPointerMove = e => {
+      if (!state.pointers.has(e.pointerId)) return
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      // Pan with 1 pointer
+      if (state.pointers.size === 1 && state.startVb) {
+        const p = [...state.pointers.values()][0]
+        const prev = { x: e.clientX - e.movementX, y: e.clientY - e.movementY }
+        // movementX/Y unreliable on touch, compute from stored last position
+        const last = wrap.__mermaidLastSinglePointer || p
+        const dxClient = p.x - last.x
+        const dyClient = p.y - last.y
+        wrap.__mermaidLastSinglePointer = p
+
+        const { rect } = clientToViewBox(p.x, p.y)
+        const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        const dx = dxClient * (vb[2] / rect.width)
+        const dy = dyClient * (vb[3] / rect.height)
+        setCurVb([vb[0] - dx, vb[1] - dy, vb[2], vb[3]])
+        return
+      }
+
+      // Pinch zoom with 2 pointers
+      if (state.pointers.size === 2 && state.startVb && state.startDist > 0) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        const dist = Math.hypot(dx, dy)
+        if (!dist) return
+        const factor = state.startDist / dist // dist bigger => zoom in (viewBox smaller)
+
+        const cx = (pts[0].x + pts[1].x) / 2
+        const cy = (pts[0].y + pts[1].y) / 2
+        const centerClient = { x: cx, y: cy }
+
+        const pxy = clientToViewBox(centerClient.x, centerClient.y)
+        const cpx = pxy.x
+        const cpy = pxy.y
+
+        const vb = zoomAtPoint(state.startVb, factor, cpx, cpy)
+        setCurVb(vb)
+      }
+    }
+
+    const onPointerUpOrCancel = e => {
+      state.pointers.delete(e.pointerId)
+      if (state.pointers.size === 0) {
+        state.startVb = null
+        state.startDist = 0
+        state.startCenter = null
+        wrap.__mermaidLastSinglePointer = null
+      } else if (state.pointers.size === 1) {
+        // reset single pointer baseline to avoid jump
+        wrap.__mermaidLastSinglePointer = [...state.pointers.values()][0]
+      }
+    }
+
+    // Wheel zoom (mouse/trackpad)
+    const onWheel = e => {
+      // ctrlKey on mac trackpad pinch; we treat both as zoom
+      e.preventDefault()
+      const delta = e.deltaY
+      const zoomFactor = delta > 0 ? 1.1 : 0.9
+      const { x, y } = clientToViewBox(e.clientX, e.clientY)
+      const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      setCurVb(zoomAtPoint(vb, zoomFactor, x, y))
+    }
+
+    const onDblClick = () => {
+      const init = wrap.__mermaidInitViewBox
+      if (!init) return
+      wrap.__mermaidCurViewBox = init.slice()
+      setSvgViewBox(svg, init)
+    }
+
+    svg.addEventListener('pointerdown', onPointerDown)
+    svg.addEventListener('pointermove', onPointerMove)
+    svg.addEventListener('pointerup', onPointerUpOrCancel)
+    svg.addEventListener('pointercancel', onPointerUpOrCancel)
+    svg.addEventListener('wheel', onWheel, { passive: false })
+    svg.addEventListener('dblclick', onDblClick)
+  }
+
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+
+      // Clear old render (themeChange/pjax will rerun)
+      const oldSvg = item.querySelector('svg')
+      if (oldSvg) oldSvg.remove()
+      item.__mermaidGestureBound = false
+
+      const config = mermaidSrc.dataset.config ? JSON.parse(mermaidSrc.dataset.config) : {}
+      if (!config.theme) {
+        config.theme = theme
+      }
+      const mermaidThemeConfig = `%%{init: ${JSON.stringify(config)}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+        if (true) initMermaidGestures(item)
+        item.__mermaidOriginalSvg = svg
+        if (true) attachMermaidViewerButton(item)
+      }
+
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@11.12.2/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
