@@ -1,0 +1,657 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结 | yee01001100</title><meta name="author" content="yee01001100"><meta name="copyright" content="yee01001100"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结 场景还原：Windows + WSL2 中安装 openEuler 24.03，装了 xrdp 后远程桌面”能连上、但登录后进不去桌面”。最终解决：切到 Xvnc 后端 + 补 startwm 脚本，并把整个发行版从 C 盘迁到 D 盘。本文按”现象 → 排查 → 根因 → 修复 → 验证 → 延伸”的顺序整理，附">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结">
+<meta property="og:url" content="https://yee01001100.github.io/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="yee01001100">
+<meta property="og:description" content="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结 场景还原：Windows + WSL2 中安装 openEuler 24.03，装了 xrdp 后远程桌面”能连上、但登录后进不去桌面”。最终解决：切到 Xvnc 后端 + 补 startwm 脚本，并把整个发行版从 C 盘迁到 D 盘。本文按”现象 → 排查 → 根因 → 修复 → 验证 → 延伸”的顺序整理，附">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yee01001100.github.io/img/covers/cover-linux-1.svg">
+<meta property="article:published_time" content="2026-09-09T12:24:00.000Z">
+<meta property="article:modified_time" content="2026-09-21T14:01:06.453Z">
+<meta property="article:author" content="yee01001100">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yee01001100.github.io/img/covers/cover-linux-1.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结",
+  "url": "https://yee01001100.github.io/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/",
+  "image": "https://yee01001100.github.io/img/covers/cover-linux-1.svg",
+  "datePublished": "2026-09-09T12:24:00.000Z",
+  "dateModified": "2026-09-21T14:01:06.453Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "yee01001100",
+      "url": "https://yee01001100.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://yee01001100.github.io/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.9/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/covers/cover-linux-1.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">yee01001100</span></a><a class="nav-page-title" href="/"><span class="site-name">openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-09-09T12:24:00.000Z" title="发表于 2026-09-09 20:24:00">2026-09-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-21T14:01:06.453Z" title="更新于 2026-09-21 22:01:06">2026-09-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="openEuler-WSL2-xrdp-远程桌面完整排障与磁盘迁移-——-学习总结"><a href="#openEuler-WSL2-xrdp-远程桌面完整排障与磁盘迁移-——-学习总结" class="headerlink" title="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结"></a>openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结</h1><blockquote>
+<p>场景还原：Windows + WSL2 中安装 openEuler 24.03，装了 xrdp 后远程桌面”能连上、但登录后进不去桌面”。<br>最终解决：切到 Xvnc 后端 + 补 startwm 脚本，并把整个发行版从 C 盘迁到 D 盘。<br>本文按”现象 → 排查 → 根因 → 修复 → 验证 → 延伸”的顺序整理，附带原理讲解。</p>
+</blockquote>
+<hr>
+<h2 id="一、先建立正确的心智模型：xrdp-的工作链路"><a href="#一、先建立正确的心智模型：xrdp-的工作链路" class="headerlink" title="一、先建立正确的心智模型：xrdp 的工作链路"></a>一、先建立正确的心智模型：xrdp 的工作链路</h2><p>远程桌面要真正出现桌面，链路是<strong>五段接力</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Windows 远程桌面客户端 (mstsc)</span><br><span class="line">        │  RDP 协议 (TCP 3389)</span><br><span class="line">        ▼</span><br><span class="line">xrdp（前端，负责 RDP 握手、登录界面）</span><br><span class="line">        │  UNIX socket 通信</span><br><span class="line">        ▼</span><br><span class="line">xrdp-sesman（会话管理器：PAM 认证、分配 display 号、拉起会话）</span><br><span class="line">        │</span><br><span class="line">        ├─► Xorg / Xvnc（后端&quot;显示服务器&quot;，真正画屏幕的那个）</span><br><span class="line">        │        │  DISPLAY=:10</span><br><span class="line">        │        ▼</span><br><span class="line">        └─► startwm.sh（窗口管理器脚本，负责把桌面环境跑起来）</span><br><span class="line">                 │</span><br><span class="line">                 ▼</span><br><span class="line">            桌面会话 (UKUI: kwin 窗口管理器 + panel + 文件管理器…)</span><br></pre></td></tr></table></figure>
+
+<p><strong>“能连上”只证明第一段（xrdp 前端 + 登录界面）是好的</strong>；”进不去桌面”说明问题出在后三段：显示服务器没起来，或窗口管理器没起来。这个心智模型决定了排查时该看哪里。</p>
+<hr>
+<h2 id="二、排查过程（方法比结论重要）"><a href="#二、排查过程（方法比结论重要）" class="headerlink" title="二、排查过程（方法比结论重要）"></a>二、排查过程（方法比结论重要）</h2><h3 id="第-1-步：确认”表面状态”"><a href="#第-1-步：确认”表面状态”" class="headerlink" title="第 1 步：确认”表面状态”"></a>第 1 步：确认”表面状态”</h3><p>进发行版先看三样东西，10 秒钟判断服务层是否健康：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl status xrdp xrdp-sesman   <span class="comment"># 服务活着吗</span></span><br><span class="line">ss -tln | grep 3389                 <span class="comment"># 端口在听吗</span></span><br><span class="line">ps -ef | grep -E <span class="string">&#x27;xrdp|Xvnc|Xorg&#x27;</span>   <span class="comment"># 进程在跑吗</span></span><br></pre></td></tr></table></figure>
+
+<p>本例：服务 active、3389 正常监听 → <strong>前端没问题</strong>，问题在会话创建。</p>
+<h3 id="第-2-步：看日志，让系统自己告诉你答案"><a href="#第-2-步：看日志，让系统自己告诉你答案" class="headerlink" title="第 2 步：看日志，让系统自己告诉你答案"></a>第 2 步：看日志，让系统自己告诉你答案</h3><p>xrdp 的日志分三层，对应上面的链路：</p>
+<table>
+<thead>
+<tr>
+<th>日志</th>
+<th>对应层</th>
+<th>本例中的关键行</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/var/log/xrdp.log</code></td>
+<td>前端</td>
+<td><code>Can&#39;t create session for user yee - X server could not be started</code></td>
+</tr>
+<tr>
+<td><code>/var/log/xrdp-sesman.log</code></td>
+<td>会话管理</td>
+<td><code>Starting X server on display 10: /usr/libexec/Xorg :10 ...</code> 之后 <code>waitforx: Unable to open display :10</code> → <code>X server failed to start</code></td>
+</tr>
+<tr>
+<td><code>~/.xorgxrdp.10.log</code></td>
+<td>X 本身</td>
+<td><code>(EE) parse_vt_settings: Cannot open /dev/tty0 (Permission denied)</code> → <code>Fatal server error</code></td>
+</tr>
+</tbody></table>
+<p>三份日志层层递进，把问题从”会话失败”缩小到”Xorg 崩了”，再定位到”打不开 &#x2F;dev&#x2F;tty0”。</p>
+<h3 id="第-3-步：挖根因（本例有三个坑）"><a href="#第-3-步：挖根因（本例有三个坑）" class="headerlink" title="第 3 步：挖根因（本例有三个坑）"></a>第 3 步：挖根因（本例有三个坑）</h3><p><strong>坑 1：WSL 没有真实虚拟终端，Xorg 以普通用户身份启动时碰壁</strong></p>
+<ul>
+<li><code>/dev/tty0</code> 权限是 <code>crw--w---- root tty</code>，登录用户 yee 不在 tty 组 → 无权打开 → Xorg 直接 Fatal</li>
+<li>佐证：Xorg 的日志文件写在了 <code>/home/yee/</code> 下 → 说明 sesman 是以 <strong>yee 的身份</strong>去启动 Xorg 的（普通用户的 Xorg 在 WSL 里走不通）</li>
+<li>在真实 Linux 机器上 Xorg 能跑，是因为有完整的 VT&#x2F;DRM 环境；<strong>WSL2 是个精简虚拟机，没有这些</strong></li>
+</ul>
+<blockquote>
+<p>顺带踩到的坑：<code>rpm -q xorg-x11-server-Xorg</code> 报”未安装”，但 <code>/usr/libexec/Xorg</code> 明明存在——openEuler 的包名是 <code>xorg-x11-server</code>。<strong>查文件属于哪个包要用 <code>rpm -qf /实际/路径</code>，别猜包名。</strong></p>
+</blockquote>
+<p><strong>坑 2：窗口管理器脚本 startwm.sh 不存在</strong></p>
+<ul>
+<li>sesman.ini 里写的 <code>startwm.sh</code> 期望在 <code>/etc/xrdp/</code>（或用户家目录），但 rpm 包把它装在了 <code>/usr/libexec/xrdp/</code> —— 文件在，位置不对，等于没有</li>
+<li>后果：就算 X 起来了，也没有任何东西去启动桌面会话 → 还是黑屏&#x2F;退出</li>
+<li>这解释了为什么修好 X 后端还不够，必须把 startwm 一起补上</li>
+</ul>
+<p><strong>坑 3（潜在）：默认会话类型是 Xorg</strong></p>
+<ul>
+<li>xrdp.ini 里 <code>[Xorg]</code> 排在 <code>[Xvnc]</code> 前面 → 登录界面默认选 Xorg → 每次都走死路</li>
+</ul>
+<hr>
+<h2 id="三、解决方案：为什么切-Xvnc-而不是硬修-Xorg"><a href="#三、解决方案：为什么切-Xvnc-而不是硬修-Xorg" class="headerlink" title="三、解决方案：为什么切 Xvnc 而不是硬修 Xorg"></a>三、解决方案：为什么切 Xvnc 而不是硬修 Xorg</h2><p>两条路：</p>
+<table>
+<thead>
+<tr>
+<th>路线</th>
+<th>要做什么</th>
+<th>评价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>修 Xorg</td>
+<td>装 xorgxrdp、解决 &#x2F;dev&#x2F;tty0 访问（加组&#x2F;改权限&#x2F;ioctl 限制）</td>
+<td>在 WSL 里绕来绕去，脆弱</td>
+</tr>
+<tr>
+<td><strong>切 Xvnc</strong></td>
+<td>系统已装 tigervnc-server，只需改配置</td>
+<td><strong>Xvnc 是纯用户态 X 服务器，不需要 VT、不需要显卡驱动，天然适合容器&#x2F;WSL</strong> ✅</td>
+</tr>
+</tbody></table>
+<p>选了 Xvnc，改动三处（全部先备份原文件再改）：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1) /etc/xrdp/xrdp.ini：把整个 [Xvnc] 会话块挪到 [Xorg] 前面</span></span><br><span class="line"><span class="comment">#    （登录界面&quot;会话&quot;下拉框的默认项 = 排在最前面的会话）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2) /etc/xrdp/sesman.ini</span></span><br><span class="line"><span class="attr">DefaultWindowManager</span>=/etc/xrdp/startwm.sh     <span class="comment"># 用绝对路径，最稳</span></span><br><span class="line"><span class="attr">ReconnectScript</span>=/usr/libexec/xrdp/reconnectwm.sh</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 3) 新建 /etc/xrdp/startwm.sh（chmod 755）—— 真正的&quot;桌面启动器&quot;</span></span><br><span class="line"><span class="comment">#!/bin/sh</span></span><br><span class="line">[ -r /etc/profile ] &amp;&amp; . /etc/profile</span><br><span class="line">[ -r /etc/default/locale ] &amp;&amp; . /etc/default/locale</span><br><span class="line"><span class="built_in">export</span> LANG LANGUAGE LC_ALL</span><br><span class="line"><span class="built_in">unset</span> DBUS_SESSION_BUS_ADDRESS</span><br><span class="line"><span class="built_in">export</span> XDG_SESSION_TYPE=x11 XDG_CURRENT_DESKTOP=UKUI XDG_SESSION_DESKTOP=UKUI</span><br><span class="line"><span class="built_in">exec</span> dbus-run-session -- /usr/bin/ukui-session</span><br></pre></td></tr></table></figure>
+
+<p>要点讲解：</p>
+<ul>
+<li><strong>xrdp 的 Xvnc 后端会自动处理认证</strong>：登录时你输的密码就是 VNC 密码，不需要手动 <code>vncpasswd</code>，这是 xrdp + tigervnc 的标准玩法</li>
+<li><code>dbus-run-session</code>：给会话建一条<strong>独立的 D-Bus 会话总线</strong>，Qt 系桌面（UKUI&#x2F;KDE）没有它起不来</li>
+<li><code>XDG_CURRENT_DESKTOP</code> 等变量告诉桌面组件”我在 UKUI 环境里”</li>
+<li>display 号从 <code>:10</code> 开始（sesman.ini 的 <code>X11DisplayOffset=10</code>），会话间自动错开</li>
+</ul>
+<h3 id="验证方法（不连-RDP-也能测）"><a href="#验证方法（不连-RDP-也能测）" class="headerlink" title="验证方法（不连 RDP 也能测）"></a>验证方法（不连 RDP 也能测）</h3><p>用目标用户身份在虚拟 display 上手动把会话”演一遍”，看进程是否存活：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">runuser -l yee -c <span class="string">&#x27;Xvnc :20 -SecurityTypes None -nolisten tcp -localhost &amp;&#x27;</span></span><br><span class="line">runuser -l yee -c <span class="string">&#x27;DISPLAY=:20 dbus-run-session -- /usr/bin/ukui-session &amp;&#x27;</span></span><br><span class="line">ps -ef | grep -E <span class="string">&#x27;ukui|kwin|peony&#x27;</span>   <span class="comment"># ukui-kwin_x11 / ukui-panel / peony-qt-desktop 都活着 = 成功</span></span><br><span class="line"><span class="comment"># 测完清理：pkill -f &#x27;ukui-session&#x27;; pkill -f &#x27;Xvnc :20&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>实测输出里 <code>ukui-kwin_x11</code>、<code>ukui-panel</code>、<code>peony-qt-desktop</code>（文件管理器）全部拉起 → 桌面环境本身没问题 → 剩下的交给真实 RDP 连接验证。</p>
+<hr>
+<h2 id="四、延伸问题-1：xrdp-开机自启吗？"><a href="#四、延伸问题-1：xrdp-开机自启吗？" class="headerlink" title="四、延伸问题 1：xrdp 开机自启吗？"></a>四、延伸问题 1：xrdp 开机自启吗？</h2><p><strong>在 systemd 层面：会。</strong> 原理是单元依赖：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xrdp.service:   Requires=xrdp-sesman.service   （硬依赖：启动我必先启动它）</span><br><span class="line">                After=xrdp-sesman.service      （顺序：它先就绪我再上）</span><br></pre></td></tr></table></figure>
+
+<p><code>xrdp.service</code> 是 enabled 的 → 发行版每次启动，systemd 拉起 xrdp 时会<strong>连带拉起 sesman</strong>（所以 sesman 单独是 disabled 也没关系）。</p>
+<p>实测验证方法（模拟”下次打开 WSL”）：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--terminate</span> openEuler<span class="literal">-24</span>.<span class="number">03</span>    <span class="comment"># 停掉发行版</span></span><br><span class="line">wsl <span class="literal">-u</span> root <span class="literal">-d</span> openEuler<span class="literal">-24</span>.<span class="number">03</span> <span class="literal">--</span> /bin/true   <span class="comment"># 再启动它</span></span><br><span class="line"><span class="comment"># 然后检查：systemctl is-active xrdp xrdp-sesman → active；ss -tln 有 3389</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>WSL 特有的边界</strong>：systemd 自启的触发点是”<strong>发行版启动</strong>“。Windows 重启后 WSL 默认处于 Stopped，必须先激活一次发行版（跑任意 <code>wsl</code> 命令）才会轮到 systemd 干活。想要 Windows 一开机就能连，还得配 Windows 侧的计划任务，那是另一层的事。</p>
+<hr>
+<h2 id="五、延伸问题-2：发行版占-C-盘空间怎么办？"><a href="#五、延伸问题-2：发行版占-C-盘空间怎么办？" class="headerlink" title="五、延伸问题 2：发行版占 C 盘空间怎么办？"></a>五、延伸问题 2：发行版占 C 盘空间怎么办？</h2><h3 id="先分清两个概念"><a href="#先分清两个概念" class="headerlink" title="先分清两个概念"></a>先分清两个概念</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>是什么</th>
+<th>在哪</th>
+<th>能不能动</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>WSL 引擎</td>
+<td>wsl.exe、内核、WSLg</td>
+<td>C 盘系统区</td>
+<td>固定，只占几百 MB</td>
+</tr>
+<tr>
+<td>发行版数据</td>
+<td><strong>单个虚拟磁盘文件 <code>ext4.vhdx</code></strong></td>
+<td>商店版默认 <code>%LOCALAPPDATA%\Packages\&lt;包名&gt;\LocalState\</code></td>
+<td><strong>可以搬、可以瘦</strong></td>
+</tr>
+</tbody></table>
+<p>“WSL 在 C 盘”的大头其实只是这一个文件。本例：ext4.vhdx 占 7.6 GB，而发行版里真实数据只有 5.7 GB —— <strong>动态扩展的虚拟磁盘只涨不缩，删了文件也不会自动变小</strong>（虚胖 ~1.9 GB）。</p>
+<h3 id="手段一览（从轻到重）"><a href="#手段一览（从轻到重）" class="headerlink" title="手段一览（从轻到重）"></a>手段一览（从轻到重）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1) 内部清理（发行版内）</span></span><br><span class="line">dnf clean all                        <span class="comment"># 清软件源缓存（本例 288 MB）</span></span><br><span class="line">journalctl --vacuum-size=50M         <span class="comment"># 收缩系统日志</span></span><br><span class="line">fstrim -av                           <span class="comment"># 告诉虚拟磁盘&quot;这些块没用了&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2) 稀疏化：以后删文件自动回收（WSL ≥ 2.0 官方功能，免管理员）</span></span><br><span class="line">wsl --terminate openEuler-24.03</span><br><span class="line">wsl --manage openEuler-24.03 --set-sparse <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3) 整体搬家到别的盘（本次采用）</span></span><br><span class="line">wsl --shutdown                       <span class="comment"># 注意：--terminate 不够！VM 还锁着磁盘文件</span></span><br><span class="line">wsl --manage openEuler-24.03 --move D:\WSL\openEuler-24.03</span><br><span class="line"><span class="comment"># 效果：发行版名、用户、数据原样保留，只改磁盘挂载位置；C 盘立即释放 7.6 GB</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4) 备用：导出导入（更重，一般不用）</span></span><br><span class="line">wsl --<span class="built_in">export</span>  &lt;发行版&gt;  backup.tar</span><br><span class="line">wsl --unregister &lt;发行版&gt;</span><br><span class="line">wsl --import   &lt;发行版&gt;  D:\新位置  backup.tar --version 2</span><br></pre></td></tr></table></figure>
+
+<p><strong>踩坑实录</strong>：第一次搬家用了 <code>--terminate</code> 再 <code>--move</code>，报 <code>ERROR_SHARING_VIOLATION</code>（文件被占用）——因为终止发行版 ≠ 停掉 WSL2 虚拟机，磁盘还挂在 VM 上。<strong>必须 <code>wsl --shutdown</code> 让 VM 完全退出</strong>，move 才能成功。</p>
+<hr>
+<h2 id="六、可复用的经验清单（考点总结）"><a href="#六、可复用的经验清单（考点总结）" class="headerlink" title="六、可复用的经验清单（考点总结）"></a>六、可复用的经验清单（考点总结）</h2><ol>
+<li><strong>“能连上 ≠ 能用”</strong>：RDP 握手成功只说明 xrdp 前端正常；桌面出不来，按链路往后查——显示服务器 → 窗口管理器脚本 → 桌面环境</li>
+<li><strong>日志三级递进</strong>：<code>xrdp.log</code>（前端）→ <code>xrdp-sesman.log</code>（会话）→ <code>~/.xorgxrdp.N.log</code>（X 服务器自己），错误一定会留在某一级里</li>
+<li><strong>WSL 三大特殊性</strong>：没有真实 VT（&#x2F;dev&#x2F;tty0 是坑）、没有 GPU（Xorg 后端受限）、systemd 要手动开启（<code>/etc/wsl.conf</code> 写 <code>[boot] systemd=true</code>）——所以 <strong>Xvnc 后端是 WSL&#x2F;容器里的通用解法</strong></li>
+<li><strong>查包别猜名</strong>：用 <code>rpm -qf &lt;文件路径&gt;</code> 反查归属；openEuler 的 Xorg 包就叫 <code>xorg-x11-server</code></li>
+<li><strong>配置完整性检查</strong>：<code>startwm.sh</code> 这类”最后一步”文件缺失同样致命；配置里引用路径尽量写绝对路径</li>
+<li><strong>动手前先备份</strong>：改 <code>sesman.ini</code> &#x2F; <code>xrdp.ini</code> 前 <code>cp -a</code> 一份 <code>.bak</code></li>
+<li><strong>验证闭环</strong>：改完别只”看配置没问题”，要实测——模拟用户会话拉起桌面、或重启发行版验证自启</li>
+<li><strong>虚拟磁盘只涨不缩</strong>：动态 vhdx 不会自动瘦身；清理后需要 fstrim + 压缩&#x2F;稀疏化，或干脆搬到空间充裕的盘</li>
+</ol>
+<hr>
+<h2 id="附：本次操作的关键命令速查"><a href="#附：本次操作的关键命令速查" class="headerlink" title="附：本次操作的关键命令速查"></a>附：本次操作的关键命令速查</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入发行版执行命令（root）</span></span><br><span class="line">wsl <span class="literal">-u</span> root <span class="literal">-d</span> openEuler<span class="literal">-24</span>.<span class="number">03</span> <span class="literal">--</span> bash <span class="literal">-c</span> <span class="string">&quot;命令&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务与自启</span></span><br><span class="line">systemctl is<span class="literal">-enabled</span> xrdp xrdp<span class="literal">-sesman</span>     <span class="comment"># enabled / disabled</span></span><br><span class="line">systemctl restart xrdp xrdp<span class="literal">-sesman</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 磁盘</span></span><br><span class="line">wsl <span class="literal">-l</span> <span class="literal">-v</span>                                 <span class="comment"># 看状态/版本</span></span><br><span class="line">wsl <span class="literal">--shutdown</span>                            <span class="comment"># 完全停掉 WSL 虚拟机</span></span><br><span class="line">wsl <span class="literal">--manage</span> openEuler<span class="literal">-24</span>.<span class="number">03</span> <span class="literal">--move</span> D:\WSL\openEuler<span class="literal">-24</span>.<span class="number">03</span>   <span class="comment"># 搬家</span></span><br><span class="line">wsl <span class="literal">--manage</span> openEuler<span class="literal">-24</span>.<span class="number">03</span> <span class="literal">--set-sparse</span> true               <span class="comment"># 稀疏化</span></span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://yee01001100.github.io">yee01001100</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://yee01001100.github.io/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">https://yee01001100.github.io/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://yee01001100.github.io" target="_blank">yee01001100</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Linux/">Linux</a></div><div class="post-share"><div class="social-share" data-image="/img/covers/cover-linux-1.svg" data-sites="wechat,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/09/21/20260921%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97/" title="20260921更新日志"><img class="cover" src="/img/covers/cover-log-3.svg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">20260921更新日志</div></div><div class="info-2"><div class="info-item-1">20260921更新日志这次把博客从头到尾过了一遍：补齐了一直缺失的导航，处理掉几处藏在元数据里的问题，还修好了代码高亮与 Mermaid 图表。 视觉与阅读体验 补齐导航栏：menu 配置此前整段处于注释状态，导航栏是空的——分类页和标签页虽然早就建好，却没有任何入口能点进去。现已补上「首页 &#x2F; 归档 &#x2F; 分类 &#x2F; 标签」四项。 自制文章封面：按分类配色手写了 11 张 SVG 封面，首页卡片不再是一整片纯文字。 首页头图与打字机副标题：新增渐变头图，并开启副标题轮播效果。 图片灯箱：启用 fancybox，文章配图点击即可放大查看。 细节优化：开启加载动画与标题图标美化（图标颜色改为主色调蓝），侧边栏补充了公告与作者简介，并启用「站点运行时间」组件。  问题修复 语法高亮此前完全失效：syntax_highlighter 被设成了 none，Hexo 因此不输出任何语法标记，主题也不会生成代码块配色——所有代码块都是一片灰。现已改回 highlight.js。 代码块改为深色：code_blocks.theme 由 light 改为 darker...</div></div></div></a><a class="pagination-related" href="/2026/05/28/20260528%E6%97%A5%E5%B8%B8/" title="20260528日常"><img class="cover" src="/img/covers/cover-life-1.svg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">20260528日常</div></div><div class="info-2"><div class="info-item-1">其实也没啥哈哈，就是想分享一下我的女孩送我滴新鞋，想要在我的博客里也留下她的痕迹（：  </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yee01001100</div><div class="author-info-description">大二在读，折腾 Java、Linux 与嵌入式。喜欢把踩过的坑整理成能复现的教程。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/yee01001100"><i class="fab fa-github"></i><span>To my github</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yee01001100" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:yee01001100@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">这里记录 Java、Linux、SQL 与嵌入式的学习笔记和踩坑复盘。<br>如果某篇文章帮到了你，欢迎到 GitHub 留个 Star ⭐</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#openEuler-WSL2-xrdp-%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E5%AE%8C%E6%95%B4%E6%8E%92%E9%9A%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E8%BF%81%E7%A7%BB-%E2%80%94%E2%80%94-%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%85%88%E5%BB%BA%E7%AB%8B%E6%AD%A3%E7%A1%AE%E7%9A%84%E5%BF%83%E6%99%BA%E6%A8%A1%E5%9E%8B%EF%BC%9Axrdp-%E7%9A%84%E5%B7%A5%E4%BD%9C%E9%93%BE%E8%B7%AF"><span class="toc-number">1.1.</span> <span class="toc-text">一、先建立正确的心智模型：xrdp 的工作链路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%8E%92%E6%9F%A5%E8%BF%87%E7%A8%8B%EF%BC%88%E6%96%B9%E6%B3%95%E6%AF%94%E7%BB%93%E8%AE%BA%E9%87%8D%E8%A6%81%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">二、排查过程（方法比结论重要）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC-1-%E6%AD%A5%EF%BC%9A%E7%A1%AE%E8%AE%A4%E2%80%9D%E8%A1%A8%E9%9D%A2%E7%8A%B6%E6%80%81%E2%80%9D"><span class="toc-number">1.2.1.</span> <span class="toc-text">第 1 步：确认”表面状态”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC-2-%E6%AD%A5%EF%BC%9A%E7%9C%8B%E6%97%A5%E5%BF%97%EF%BC%8C%E8%AE%A9%E7%B3%BB%E7%BB%9F%E8%87%AA%E5%B7%B1%E5%91%8A%E8%AF%89%E4%BD%A0%E7%AD%94%E6%A1%88"><span class="toc-number">1.2.2.</span> <span class="toc-text">第 2 步：看日志，让系统自己告诉你答案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC-3-%E6%AD%A5%EF%BC%9A%E6%8C%96%E6%A0%B9%E5%9B%A0%EF%BC%88%E6%9C%AC%E4%BE%8B%E6%9C%89%E4%B8%89%E4%B8%AA%E5%9D%91%EF%BC%89"><span class="toc-number">1.2.3.</span> <span class="toc-text">第 3 步：挖根因（本例有三个坑）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%88%87-Xvnc-%E8%80%8C%E4%B8%8D%E6%98%AF%E7%A1%AC%E4%BF%AE-Xorg"><span class="toc-number">1.3.</span> <span class="toc-text">三、解决方案：为什么切 Xvnc 而不是硬修 Xorg</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E6%96%B9%E6%B3%95%EF%BC%88%E4%B8%8D%E8%BF%9E-RDP-%E4%B9%9F%E8%83%BD%E6%B5%8B%EF%BC%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">验证方法（不连 RDP 也能测）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%BB%B6%E4%BC%B8%E9%97%AE%E9%A2%98-1%EF%BC%9Axrdp-%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%90%97%EF%BC%9F"><span class="toc-number">1.4.</span> <span class="toc-text">四、延伸问题 1：xrdp 开机自启吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%BB%B6%E4%BC%B8%E9%97%AE%E9%A2%98-2%EF%BC%9A%E5%8F%91%E8%A1%8C%E7%89%88%E5%8D%A0-C-%E7%9B%98%E7%A9%BA%E9%97%B4%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F"><span class="toc-number">1.5.</span> <span class="toc-text">五、延伸问题 2：发行版占 C 盘空间怎么办？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%88%E5%88%86%E6%B8%85%E4%B8%A4%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="toc-number">1.5.1.</span> <span class="toc-text">先分清两个概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E6%AE%B5%E4%B8%80%E8%A7%88%EF%BC%88%E4%BB%8E%E8%BD%BB%E5%88%B0%E9%87%8D%EF%BC%89"><span class="toc-number">1.5.2.</span> <span class="toc-text">手段一览（从轻到重）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84%E7%BB%8F%E9%AA%8C%E6%B8%85%E5%8D%95%EF%BC%88%E8%80%83%E7%82%B9%E6%80%BB%E7%BB%93%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">六、可复用的经验清单（考点总结）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%EF%BC%9A%E6%9C%AC%E6%AC%A1%E6%93%8D%E4%BD%9C%E7%9A%84%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5"><span class="toc-number">1.7.</span> <span class="toc-text">附：本次操作的关键命令速查</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/09/21/20260921%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97/" title="20260921更新日志"><img src="/img/covers/cover-log-3.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="20260921更新日志"/></a><div class="content"><a class="title" href="/2026/09/21/20260921%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97/" title="20260921更新日志">20260921更新日志</a><time datetime="2026-09-21T14:20:00.000Z" title="发表于 2026-09-21 22:20:00">2026-09-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/" title="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结"><img src="/img/covers/cover-linux-1.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结"/></a><div class="content"><a class="title" href="/2026/09/09/openEuler-xrdp-%E6%8E%92%E9%9A%9C%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/" title="openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结">openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结</a><time datetime="2026-09-09T12:24:00.000Z" title="发表于 2026-09-09 20:24:00">2026-09-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/28/20260528%E6%97%A5%E5%B8%B8/" title="20260528日常"><img src="/img/covers/cover-life-1.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="20260528日常"/></a><div class="content"><a class="title" href="/2026/05/28/20260528%E6%97%A5%E5%B8%B8/" title="20260528日常">20260528日常</a><time datetime="2026-05-28T11:59:37.000Z" title="发表于 2026-05-28 19:59:37">2026-05-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/" title="sql语法速查录"><img src="/img/covers/cover-syntax-2.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="sql语法速查录"/></a><div class="content"><a class="title" href="/2026/04/27/sql%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5%E5%BD%95/" title="sql语法速查录">sql语法速查录</a><time datetime="2026-04-27T09:16:48.000Z" title="发表于 2026-04-27 17:16:48">2026-04-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/04/26/JAVA%E8%AF%AD%E6%B3%95%E9%9B%86/" title="JAVA语法集"><img src="/img/covers/cover-syntax-1.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JAVA语法集"/></a><div class="content"><a class="title" href="/2026/04/26/JAVA%E8%AF%AD%E6%B3%95%E9%9B%86/" title="JAVA语法集">JAVA语法集</a><time datetime="2026-04-26T12:50:11.000Z" title="发表于 2026-04-26 20:50:11">2026-04-26</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yee01001100</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.9/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const parseViewBox = viewBox => {
+    if (!viewBox) return null
+    const parts = viewBox.trim().split(/[\s,]+/).map(n => Number(n))
+    if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return null
+    return parts
+  }
+
+  const getSvgViewBox = svg => {
+    const attr = parseViewBox(svg.getAttribute('viewBox'))
+    if (attr) return attr
+
+    // Fallback: use bbox to build a viewBox
+    try {
+      const bbox = svg.getBBox()
+      if (bbox && bbox.width && bbox.height) return [bbox.x, bbox.y, bbox.width, bbox.height]
+    } catch (e) {
+      // getBBox may fail on some edge cases; ignore
+    }
+
+    const w = Number(svg.getAttribute('width')) || 0
+    const h = Number(svg.getAttribute('height')) || 0
+    if (w > 0 && h > 0) return [0, 0, w, h]
+    return [0, 0, 100, 100]
+  }
+
+  const setSvgViewBox = (svg, vb) => {
+    svg.setAttribute('viewBox', `${vb[0]} ${vb[1]} ${vb[2]} ${vb[3]}`)
+  }
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+  const openSvgInNewTab = ({ source, initViewBox }) => {
+    const getClonedSvg = () => {
+      if (typeof source === 'string') {
+        const template = document.createElement('template')
+        template.innerHTML = source.trim()
+        const svg = template.content.querySelector('svg')
+        return svg ? svg.cloneNode(true) : null
+      }
+      if (source && typeof source.cloneNode === 'function') {
+        return source.cloneNode(true)
+      }
+      return null
+    }
+
+    const clone = getClonedSvg()
+    if (!clone) return
+    if (initViewBox && initViewBox.length === 4) {
+      clone.setAttribute('viewBox', initViewBox.join(' '))
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    if (!clone.getAttribute('xmlns:xlink') && clone.outerHTML.includes('xlink:')) {
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+    }
+    // inject background to match current theme
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    const bg = getComputedStyle(document.body).backgroundColor || (isDark ? '#1e1e1e' : '#ffffff')
+    if (!clone.style.background) clone.style.background = bg
+
+    const serializer = new XMLSerializer()
+    const svgSource = serializer.serializeToString(clone)
+    const htmlSource = `<!doctype html><html><head><meta charset="utf-8" />
+      <style>
+        html, body { width: 100%; height: 100%; margin: 0; display: flex; align-items: center; justify-content: center; background: ${bg}; }
+        svg { max-width: 100%; max-height: 100%; height: auto; width: auto; }
+      </style>
+      </head><body>${svgSource}</body></html>`
+    const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 30000)
+  }
+
+  const attachMermaidViewerButton = wrap => {
+    let btn = wrap.querySelector('.mermaid-open-btn')
+    if (!btn) {
+      btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'mermaid-open-btn'
+      wrap.appendChild(btn)
+    }
+
+    btn.innerHTML = '<i class="fa fa-search fa-fw" aria-hidden="true"></i>'
+
+    if (!btn.__mermaidViewerBound) {
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        e.stopPropagation()
+        const svg = wrap.__mermaidOriginalSvg || wrap.querySelector('svg')
+        if (!svg) return
+        const initViewBox = wrap.__mermaidInitViewBox
+        if (typeof svg === 'string') {
+          openSvgInNewTab({ source: svg, initViewBox })
+          return
+        }
+        openSvgInNewTab({ source: svg, initViewBox })
+      })
+      btn.__mermaidViewerBound = true
+    }
+  }
+
+  // Zoom around a point (px, py) in the SVG viewport (in viewBox coordinates)
+  const zoomAtPoint = (vb, factor, px, py) => {
+    const w = vb[2] * factor
+    const h = vb[3] * factor
+    const nx = px - (px - vb[0]) * factor
+    const ny = py - (py - vb[1]) * factor
+    return [nx, ny, w, h]
+  }
+
+  const initMermaidGestures = wrap => {
+    const svg = wrap.querySelector('svg')
+    if (!svg) return
+
+    // Ensure viewBox exists so gestures always work
+    const initVb = getSvgViewBox(svg)
+    wrap.__mermaidInitViewBox = initVb
+    wrap.__mermaidCurViewBox = initVb.slice()
+    setSvgViewBox(svg, initVb)
+
+    // Avoid binding multiple times on themeChange/pjax
+    if (wrap.__mermaidGestureBound) return
+    wrap.__mermaidGestureBound = true
+
+    // Helper: map client (viewport) coordinate -> viewBox coordinate
+    const clientToViewBox = (clientX, clientY) => {
+      const rect = svg.getBoundingClientRect()
+      const vb = wrap.__mermaidCurViewBox || getSvgViewBox(svg)
+      const x = vb[0] + (clientX - rect.left) * (vb[2] / rect.width)
+      const y = vb[1] + (clientY - rect.top) * (vb[3] / rect.height)
+      return { x, y, rect, vb }
+    }
+
+    const state = {
+      pointers: new Map(),
+      startVb: null,
+      startDist: 0,
+      startCenter: null
+    }
+
+    const clampVb = vb => {
+      const init = wrap.__mermaidInitViewBox || vb
+      const minW = init[2] * 0.1
+      const maxW = init[2] * 10
+      const minH = init[3] * 0.1
+      const maxH = init[3] * 10
+      vb[2] = clamp(vb[2], minW, maxW)
+      vb[3] = clamp(vb[3], minH, maxH)
+      return vb
+    }
+
+    const setCurVb = vb => {
+      vb = clampVb(vb)
+      wrap.__mermaidCurViewBox = vb
+      setSvgViewBox(svg, vb)
+    }
+
+    const onPointerDown = e => {
+      // Allow only primary button for mouse
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      svg.setPointerCapture(e.pointerId)
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      if (state.pointers.size === 1) {
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      } else if (state.pointers.size === 2) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        state.startDist = Math.hypot(dx, dy)
+        state.startVb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        state.startCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      }
+    }
+
+    const onPointerMove = e => {
+      if (!state.pointers.has(e.pointerId)) return
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+      // Pan with 1 pointer
+      if (state.pointers.size === 1 && state.startVb) {
+        const p = [...state.pointers.values()][0]
+        const prev = { x: e.clientX - e.movementX, y: e.clientY - e.movementY }
+        // movementX/Y unreliable on touch, compute from stored last position
+        const last = wrap.__mermaidLastSinglePointer || p
+        const dxClient = p.x - last.x
+        const dyClient = p.y - last.y
+        wrap.__mermaidLastSinglePointer = p
+
+        const { rect } = clientToViewBox(p.x, p.y)
+        const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+        const dx = dxClient * (vb[2] / rect.width)
+        const dy = dyClient * (vb[3] / rect.height)
+        setCurVb([vb[0] - dx, vb[1] - dy, vb[2], vb[3]])
+        return
+      }
+
+      // Pinch zoom with 2 pointers
+      if (state.pointers.size === 2 && state.startVb && state.startDist > 0) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        const dist = Math.hypot(dx, dy)
+        if (!dist) return
+        const factor = state.startDist / dist // dist bigger => zoom in (viewBox smaller)
+
+        const cx = (pts[0].x + pts[1].x) / 2
+        const cy = (pts[0].y + pts[1].y) / 2
+        const centerClient = { x: cx, y: cy }
+
+        const pxy = clientToViewBox(centerClient.x, centerClient.y)
+        const cpx = pxy.x
+        const cpy = pxy.y
+
+        const vb = zoomAtPoint(state.startVb, factor, cpx, cpy)
+        setCurVb(vb)
+      }
+    }
+
+    const onPointerUpOrCancel = e => {
+      state.pointers.delete(e.pointerId)
+      if (state.pointers.size === 0) {
+        state.startVb = null
+        state.startDist = 0
+        state.startCenter = null
+        wrap.__mermaidLastSinglePointer = null
+      } else if (state.pointers.size === 1) {
+        // reset single pointer baseline to avoid jump
+        wrap.__mermaidLastSinglePointer = [...state.pointers.values()][0]
+      }
+    }
+
+    // Wheel zoom (mouse/trackpad)
+    const onWheel = e => {
+      // ctrlKey on mac trackpad pinch; we treat both as zoom
+      e.preventDefault()
+      const delta = e.deltaY
+      const zoomFactor = delta > 0 ? 1.1 : 0.9
+      const { x, y } = clientToViewBox(e.clientX, e.clientY)
+      const vb = (wrap.__mermaidCurViewBox || getSvgViewBox(svg)).slice()
+      setCurVb(zoomAtPoint(vb, zoomFactor, x, y))
+    }
+
+    const onDblClick = () => {
+      const init = wrap.__mermaidInitViewBox
+      if (!init) return
+      wrap.__mermaidCurViewBox = init.slice()
+      setSvgViewBox(svg, init)
+    }
+
+    svg.addEventListener('pointerdown', onPointerDown)
+    svg.addEventListener('pointermove', onPointerMove)
+    svg.addEventListener('pointerup', onPointerUpOrCancel)
+    svg.addEventListener('pointercancel', onPointerUpOrCancel)
+    svg.addEventListener('wheel', onWheel, { passive: false })
+    svg.addEventListener('dblclick', onDblClick)
+  }
+
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+
+      // Clear old render (themeChange/pjax will rerun)
+      const oldSvg = item.querySelector('svg')
+      if (oldSvg) oldSvg.remove()
+      item.__mermaidGestureBound = false
+
+      const config = mermaidSrc.dataset.config ? JSON.parse(mermaidSrc.dataset.config) : {}
+      if (!config.theme) {
+        config.theme = theme
+      }
+      const mermaidThemeConfig = `%%{init: ${JSON.stringify(config)}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+        if (true) initMermaidGestures(item)
+        item.__mermaidOriginalSvg = svg
+        if (true) attachMermaidViewerButton(item)
+      }
+
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@11.12.2/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div></div></body></html>
