@@ -15,15 +15,31 @@
 -   **部署平台**: GitHub Pages
 -   **编程语言**: Markdown, HTML, CSS, JavaScript, EJS/Pug (取决于主题模板)
 
+## 📂 仓库分支说明
+
+本仓库同时保存源码与构建产物，用分支区分：
+
+| 分支 | 内容 | 用途 |
+| --- | --- | --- |
+| `source` | Hexo 源码（文章、站点配置、主题配置） | 日常写作与维护 |
+| `main` | `hexo generate` 生成的静态文件 | GitHub Pages 实际发布的站点 |
+
+**因此做开发时必须切到 `source` 分支**——`main` 分支里只有编译结果，没有可编辑的源码。
+
 ## ✨ 主题特性
 
-Butterfly 主题为本博客提供了丰富的功能支持：
+Butterfly 主题为本博客提供了丰富的功能支持。下表区分「主题具备的能力」与「本站当前是否已启用」，未启用的项在 `_config.butterfly.yml` 中配置即可打开：
 
--   **响应式设计**: 完美适配 PC、平板和移动端。
--   **代码高亮**: 支持多种代码高亮主题（如 Prism.js, Highlight.js）。
--   **评论系统**: 支持 Waline, Twikoo, Gitalk 等多种评论插件。
--   **SEO 优化**: 内置友好的 SEO 设置。
--   **暗黑模式**: 支持自动/手动切换深色模式。
+| 特性 | 主题支持 | 本站是否启用 |
+| --- | --- | --- |
+| 响应式设计（PC / 平板 / 移动端） | ✅ | ✅ |
+| 代码高亮（可切换主题） | ✅ | ✅ |
+| 暗黑模式（自动 / 手动切换） | ✅ | ✅ |
+| 页面访问统计（不蒜子 PV/UV） | ✅ | ✅ |
+| 分享组件（share.js） | ✅ | ✅ |
+| 站内搜索（本地搜索 / Algolia / DocSearch） | ✅ | ❌ 未启用（`search.use` 为空） |
+| 评论系统（Waline / Twikoo / Gitalk / Utterances / Artalk 等） | ✅ | ❌ 未启用（`comments.use` 为空） |
+| 数学公式（MathJax / KaTeX）、广告位等 | ✅ | ❌ 未启用 |
 
 ## 📦 本地运行与开发
 
@@ -35,20 +51,31 @@ Butterfly 主题为本博客提供了丰富的功能支持：
 npm install -g hexo-cli
 ```
 
-### 2. 克隆项目
+### 2. 克隆项目（注意是 `source` 分支）
 
 ```bash
-git clone https://github.com/yee01001100/yee01001100.github.io.git
-cd yee01001100.github.io
+git clone -b source https://github.com/yee01001100/yee01001100.github.io.git my-blog
+cd my-blog
 ```
 
-### 3. 安装依赖
+### 3. 获取主题
+
+`themes/butterfly` 在仓库里是以子模块引用（gitlink）的形式记录的，但仓库未包含 `.gitmodules`，所以 **clone 之后该目录是空的、直接构建会失败**，需要手动获取主题：
+
+```bash
+rm -rf themes/butterfly
+git clone https://github.com/jerryc127/hexo-theme-butterfly.git themes/butterfly
+```
+
+> 也可以用 npm 管理主题：`npm install hexo-theme-butterfly`，站点配置里的 `theme: butterfly` 不需要改动。
+
+### 4. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 4. 启动本地服务器
+### 5. 启动本地服务器
 
 ```bash
 hexo server
@@ -60,9 +87,11 @@ hexo s
 
 ## 🚀 部署流程
 
-本博客通常通过 GitHub Actions 自动部署，或者使用命令行手动部署。
+本站目前是**本地手动部署**：在 `source` 分支写文章，构建后由 `hexo-deployer-git` 把 `public/` 推送到 `main` 分支，GitHub Pages 再从 `main` 发布。
 
-### 手动部署命令
+> 注：仓库的 `.github/` 目录目前只配置了 Dependabot 依赖更新，**尚未配置自动构建部署的工作流**。
+
+### 部署命令
 
 ```bash
 # 清理缓存
@@ -73,8 +102,10 @@ hexo generate
 # 或者简写
 hexo g
 
-# 部署到 GitHub Pages
+# 部署到 GitHub Pages（推送到 main 分支）
 hexo deploy
 # 或者简写
 hexo d
 ```
+
+也可以使用 `package.json` 里定义的脚本：`npm run build`、`npm run deploy`、`npm run server`。

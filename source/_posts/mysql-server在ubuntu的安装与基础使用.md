@@ -2,8 +2,9 @@
 title: mysql-server在ubuntu的安装与基础使用
 date: 2026-04-26 20:22:59
 tags:
-  - sql
-categories: [web, SQL]
+  - SQL
+categories: [Web, SQL]
+cover: /img/covers/cover-web-1.svg
 ---
 
 # 安装 

@@ -12,13 +12,17 @@
 nav:
   # Navigation bar logo image
   logo:
-  display_title: false
+  display_title: true
   display_post_title: true
   # Whether to fix navigation bar
   fixed: false
 
 menu:
-  # Home: / || fas fa-home
+  首页: / || fas fa-home
+  归档: /archives/ || fas fa-archive
+  分类: /categories/ || fas fa-folder-open
+  标签: /tags/ || fas fa-tags
+  # 以下为 Butterfly 官方示例，按需启用：
   # List||fas fa-list:
   #   Music: /music/ || fas fa-music
   #   Movie: /movies/ || fas fa-video
@@ -29,7 +33,7 @@ menu:
 
 code_blocks:
   # Code block theme: darker / pale night / light / ocean / false
-  theme: light
+  theme: darker
   macStyle: true
   # Code block height limit (unit: px)
   height_limit: false
@@ -53,7 +57,9 @@ social:
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.png
+# 原值为 /img/favicon.png，但该文件并不存在（source/img 里没有，主题只提供 favicon.ico），
+# 会导致浏览器标签页图标 404。想换成自己的图标：把图片放到 source/img/favicon.png 后改回原值即可。
+favicon: /img/favicon.ico
 
 avatar:
   img: /img/butterfly-icon.png
@@ -66,7 +72,7 @@ disable_top_img: false
 default_top_img: /img/top.jpg
 
 # The banner image of index page
-index_img: /img/back.jpg
+index_img: /img/banner.svg
 
 # The banner image of archive page
 archive_img:
@@ -100,9 +106,12 @@ cover:
   index_enable: true
   aside_enable: true
   archives_enable: true
-  # When cover is not set, the default cover is displayed
+  # When cover is not set, the default cover is displayed（配多张时随机选一张）
   default_cover:
-    # - xxx.jpg
+    - /img/covers/cover-syntax-1.svg
+    - /img/covers/cover-tutorial-1.svg
+    - /img/covers/cover-web-1.svg
+    - /img/covers/cover-linux-1.svg
 
 # Replace Broken Images
 error_img:
@@ -149,7 +158,7 @@ index_top_img_height:
 
 # The subtitle on homepage
 subtitle:
-  enable: false
+  enable: true
   # Typewriter Effect
   effect: true
   # Customize typed.js
@@ -165,6 +174,10 @@ subtitle:
   source: false
   # If you close the typewriter effect, the subtitle will only show the first line of sub
   sub:
+    - 记录 Java、Linux 与嵌入式的学习笔记
+    - 把踩过的坑写下来，就不算白踩
+    - 代码 / 笔记 / 一点点日常
+    - 保持好奇，持续输出
 
 # Article layout on the homepage
 # 1: Cover on the left, info on the right
@@ -284,7 +297,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description:
+    description: 大二在读，折腾 Java、Linux 与嵌入式。喜欢把踩过的坑整理成能复现的教程。
     button:
       enable: true
       icon: fab fa-github
@@ -292,7 +305,7 @@ aside:
       link: https://github.com/yee01001100
   card_announcement:
     enable: true
-    content: None
+    content: 这里记录 Java、Linux、SQL 与嵌入式的学习笔记和踩坑复盘。<br>如果某篇文章帮到了你，欢迎到 GitHub 留个 Star ⭐
   card_recent_post:
     enable: true
     # If set 0 will show all
@@ -352,7 +365,7 @@ aside:
     # Time difference between publish date and now
     # Formal: Month/Day/Year Time or Year/Month/Day Time
     # Leave it empty if you don't enable this feature
-    runtime_date:
+    runtime_date: 4/18/2026 00:00:00
 
 # --------------------------------------
 # Bottom right button
@@ -439,9 +452,12 @@ wordcount:
 
 # Busuanzi count for PV / UV in site
 busuanzi:
-  site_uv: true
-  site_pv: true
-  page_pv: true
+  # 不蒜子（busuanzi.ibruce.info）服务端数据异常：个人博客的文章浏览量显示为 3.46 亿这类离谱数值。
+  # 这是服务端返回的数据本身有问题，客户端无法修正，因此暂时关闭这三项显示。
+  # 若日后确认该服务恢复正常，把对应项改回 true 即可；也可改用其他统计方案（见 20260921 更新日志）。
+  site_uv: false
+  site_pv: false
+  page_pv: false
 
 # --------------------------------------
 # Math
@@ -517,7 +533,7 @@ share:
   # Share.js
   # https://github.com/overtrue/share.js
   sharejs:
-    sites: facebook,x,wechat,weibo,qq
+    sites: wechat,qq
 
   # AddToAny
   # https://www.addtoany.com/
@@ -793,7 +809,7 @@ mask:
 
 # Loading Animation
 preloader:
-  enable: false
+  enable: true
   # source
   # 1. fullpage-loading
   # 2. pace (progress bar)
@@ -809,13 +825,13 @@ display_mode: light
 
 # Configuration for beautifying the content of the article
 beautify:
-  enable: false
+  enable: true
   # Specify the field to beautify (site or post)
   field: post
   # Specify the icon to be used as a prefix for the title, such as '\f0c1'
   title_prefix_icon:
   # Specify the color of the title prefix icon, such as '#F47466'
-  title_prefix_icon_color:
+  title_prefix_icon_color: '#2E7DAF'
 
 # Global font settings
 # Don't modify the following settings unless you know how they work
@@ -909,7 +925,7 @@ clickShowText:
 # https://github.com/francoischalifour/medium-zoom
 # https://fancyapps.com/fancybox/
 # Leave it empty if you don't need lightbox
-lightbox:
+lightbox: fancybox
 
 # --------------------------------------
 # Tag Plugins settings
@@ -933,9 +949,9 @@ abcjs:
 # Mermaid
 # https://github.com/mermaid-js/mermaid
 mermaid:
-  enable: false
+  enable: true
   # Write Mermaid diagrams using code blocks
-  code_write: false
+  code_write: true
   # built-in themes: default / forest / dark / neutral
   theme:
     light: default

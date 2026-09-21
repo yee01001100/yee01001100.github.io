@@ -4,6 +4,7 @@ date: 2026-04-19 18:23:00
 categories: [教程, MinecraftServer]
 tags:
   - Server
+cover: /img/covers/cover-tutorial-1.svg
 ---
 
 # Minecraft 1.19.4 Fabric 开服指南

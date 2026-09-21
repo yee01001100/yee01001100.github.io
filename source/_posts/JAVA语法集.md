@@ -2,10 +2,9 @@
 title: JAVA语法集
 date: 2026-04-26 20:50:11
 tags:
-  - JAVA
-categories: [语法, JAVA]
----
-
+  - Java
+categories: [语法, Java]
+cover: /img/covers/cover-syntax-1.svg
 ---
 
 # Java 语法完整参考手册

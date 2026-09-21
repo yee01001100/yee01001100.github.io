@@ -2,8 +2,9 @@
 title: sql注入与绕过
 date: 2026-04-21 15:12:00
 tags:
-  - sql
-categories: [web, SQL]
+  - SQL
+categories: [Web, SQL]
+cover: /img/covers/cover-web-2.svg
 ---
 
 SQL注入是通过将恶意SQL代码插入Web表单、URL参数或查询字符串中，利用应用程序对用户输入验证不足的漏洞，欺骗数据库执行非授权操作的安全威胁，其核心在于**数据与指令的混淆**，而绕过技术则针对安全防护机制设计，旨在规避检测规则。
@@ -124,7 +125,7 @@ SELECT * FROM users WHERE username = 'admin' OR (SELECT COUNT(*) FROM admin) > 0
 - **Unicode编码**：用`u0027`替代单引号，部分WAF无法识别。
 - **十六进制编码**：将字符串转换为十六进制（`'admin'`→`0x61646D696E`）。
 
-![](../blog_images/260428/QQ_1777357584616.png)
+![](/blog_images/260428/QQ_1777357584616.png)
 
 ### 2. 关键字混淆
 - **大小写混合**：利用SQL不区分大小写特性，如`SeLeCt`、`UnIoN`。

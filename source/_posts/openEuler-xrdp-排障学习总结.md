@@ -1,9 +1,10 @@
 ---
 title: openEuler WSL2 xrdp 远程桌面完整排障与磁盘迁移 —— 学习总结
-date: 2026-09-09-27 20:24:00
+date: 2026-09-09 20:24:00
 tags:
-  -Linux
+  - Linux
 categories: [Linux]
+cover: /img/covers/cover-linux-1.svg
 ---
 
 

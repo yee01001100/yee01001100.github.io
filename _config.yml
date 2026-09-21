@@ -43,7 +43,7 @@ render_drafts: false
 post_asset_folder: false
 relative_link: false
 future: true
-syntax_highlighter: none
+syntax_highlighter: highlight.js
 highlight:
   line_number: true
   auto_detect: false
@@ -103,4 +103,5 @@ theme: butterfly
 deploy:
   type: git
   repo: https://github.com/yee01001100/yee01001100.github.io.git
-  branch: main 
+  branch: main
+

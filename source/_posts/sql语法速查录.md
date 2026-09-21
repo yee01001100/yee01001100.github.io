@@ -2,10 +2,9 @@
 title: sql语法速查录
 date: 2026-04-27 17:16:48
 tags:
-  -sql
-categories: [语法, sql]
----
-
+  - SQL
+categories: [语法, SQL]
+cover: /img/covers/cover-syntax-2.svg
 ---
 
 以下是 **MySQL 常用 SQL 语句的详细语法及参数讲解**，覆盖数据库、表、数据操作、用户权限等核心命令。每条语句均提供**完整语法格式**与**参数说明**，可作日常开发的手边速查手册。
