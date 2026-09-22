@@ -57,9 +57,9 @@ social:
 # Image Settings
 # --------------------------------------
 
-# 原值为 /img/favicon.png，但该文件并不存在（source/img 里没有，主题只提供 favicon.ico），
-# 会导致浏览器标签页图标 404。想换成自己的图标：把图片放到 source/img/favicon.png 后改回原值即可。
-favicon: /img/favicon.ico
+# 站点图标：由头像图（source/img/butterfly-icon.png，1024x1024 / 440 KB）缩放成的 64x64 PNG，
+# 若直接拿 440 KB 原图当 favicon，每次首次访问都会多下载几百 KB。
+favicon: /img/favicon.png
 
 avatar:
   img: /img/butterfly-icon.png
