@@ -16,8 +16,8 @@ cover: /img/covers/cover-tutorial-1.svg
 2. [服务端启动](#服务端启动)
 3. [网络问题深度解析](#网络问题深度解析)
 4. [防火墙设置](#防火墙设置)
-5. [server.properties详解](#serverproperties详解)
-6. [Minecraft 1.19.4 服务端管理注意事项指南](#Minecraft 1.19.4 服务端管理注意事项指南)
+5. [server.properties详解](#server-properties详解)
+6. [Minecraft 1.19.4 服务端管理注意事项指南（后期）](#Minecraft-1-19-4-服务端管理注意事项指南（后期）)
 7. [网络诊断](#网络诊断)
 
 ---
